@@ -7,7 +7,7 @@ export default function Experience() {
 
   return (
     // Tambahkan bg-white atau slate-50 dan pastikan teksnya gelap (text-black atau slate-900)
-    <section className="bg-slate-50 py-20 px-6">
+    <section id="experience" className="bg-slate-50 py-20 px-6 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl font-bold mb-12 text-black">Experience</h2>
         <div className="space-y-8">

@@ -1,7 +1,7 @@
 // components/Hero.js
 export default function Hero() {
   return (
-    <section className="py-20 px-6 max-w-5xl mx-auto text-center md:text-left">
+    <section className="bg-white/50 py-20 px-6 max-w-5xl mx-auto text-center md:text-left">
       <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6">
         Hi, I'm <span className="text-blue-600">Martha.</span>
       </h1>

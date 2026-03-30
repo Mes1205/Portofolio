@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import CustomCursor from '@/components/CustomCursor'
 import Navbar from "@/components/navbar";
+import { ThemeProvider } from "./ThemeProvider";
 
 
 const geistSans = Geist({
@@ -31,9 +32,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col cursor-none">
-        <Navbar />
-        <CustomCursor />
-        <main>{children}</main>
+        <ThemeProvider>
+          <Navbar />
+          <CustomCursor />
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

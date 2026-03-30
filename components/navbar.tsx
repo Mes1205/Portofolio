@@ -2,11 +2,13 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/app/ThemeProvider';
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const { isDark, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0, opacity: 0 });
@@ -61,18 +63,23 @@ export default function Navbar() {
 
         {/* Glass Background */}
         <div
-          className="absolute inset-0 rounded-[29px] border border-black/30 transition-all duration-300"
+          className="absolute inset-0 rounded-[29px] border transition-all duration-300"
           style={{
-            background: isScrolled ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.3)',
+            background: isDark 
+              ? isScrolled ? 'rgba(20, 20, 20, 0.8)' : 'rgba(20, 20, 20, 0.5)'
+              : isScrolled ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)',
             backdropFilter: 'blur(10px) saturate(180%)',
             WebkitBackdropFilter: 'blur(10px) saturate(180%)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)',
+            boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.3)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
           }}
         />
 
         {/* Logo / Name */}
         <div
-          className="absolute left-[30px] top-1/2 -translate-y-1/2 cursor-pointer font-black text-[20px] text-slate-900 tracking-tighter"
+          className={`absolute left-[30px] top-1/2 -translate-y-1/2 cursor-pointer font-black text-[20px] tracking-tighter transition-colors ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}
           onClick={() => {
             setActiveIndex(0);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -91,8 +98,8 @@ export default function Navbar() {
               onClick={(e) => scrollToSection(e, link.href, index)}
               className={`text-[14px] font-semibold transition-all duration-300 cursor-pointer relative z-10 ${
                 activeIndex === index
-                  ? 'text-slate-900 opacity-100'
-                  : 'text-slate-800 opacity-60 hover:opacity-100'
+                  ? isDark ? 'text-white opacity-100' : 'text-slate-900 opacity-100'
+                  : isDark ? 'text-slate-300 opacity-60 hover:opacity-100' : 'text-slate-800 opacity-60 hover:opacity-100'
               }`}
             >
               {link.label}
@@ -112,15 +119,31 @@ export default function Navbar() {
           />
         </div>
 
-        {/* Contact Button */}
-        <div
-          className="absolute right-[10px] top-1/2 -translate-y-1/2 h-[34px] px-5 rounded-[26px] flex items-center justify-center cursor-pointer transition-transform active:scale-95 hover:opacity-90"
-          style={{ background: '#1e1b4b' }}
-          onClick={() => window.location.href = 'mailto:emailkamu@gmail.com'}
-        >
-          <p className="text-[12px] font-bold text-white flex items-center gap-2">
-            Let&apos;s Talk <Send size={14} />
-          </p>
+        {/* Contact Button & Theme Toggle */}
+        <div className="absolute right-[10px] top-1/2 -translate-y-1/2 flex items-center gap-3">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`h-[34px] w-[34px] rounded-full flex items-center justify-center transition-all hover:scale-110 ${
+              isDark 
+                ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30' 
+                : 'bg-blue-500/20 text-blue-600 hover:bg-blue-500/30'
+            }`}
+            title={isDark ? 'Light Mode' : 'Dark Mode'}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+
+          {/* Contact Button */}
+          <div
+            className="h-[34px] px-5 rounded-[26px] flex items-center justify-center cursor-pointer transition-transform active:scale-95 hover:opacity-90"
+            style={{ background: isDark ? '#60a5fa' : '#1e1b4b' }}
+            onClick={() => window.location.href = 'mailto:emailkamu@gmail.com'}
+          >
+            <p className="text-[12px] font-bold text-white flex items-center gap-2">
+              Let&apos;s Talk <Send size={14} />
+            </p>
+          </div>
         </div>
       </div>
     </nav>

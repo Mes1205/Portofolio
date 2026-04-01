@@ -5,13 +5,15 @@ import { useTheme } from '@/app/ThemeProvider';
 const projects = [
   {
     title: "Zichara",
-    desc: "Aplikasi Augmented Reality untuk belajar Hanzi & Pinyin.",
-    tech: ["Unity", "C#", "ARCore"],
+    desc: "Aplikasi Augmented Reality mobile untuk pembelajaran aksara Hanzi dan Pinyin secara interaktif. Menggunakan teknologi ARCore untuk menampilkan karakter 3D dan membantu pengguna memahami penulisan dengan cara yang lebih engaging.",
+    tech: ["Unity", "C#", "ARCore", "AR"],
+    role: "Full Stack Developer"
   },
   {
     title: "Urunin",
-    desc: "Web app untuk manajemen split-bill dan pelacakan hutang.",
-    tech: ["React.js", "Tailwind", "Firebase"],
+    desc: "Platform web untuk manajemen pengeluaran bersama dan pelacakan hutang antar teman. Fitur real-time sync, perhitungan otomatis, dan riwayat transaksi yang terstruktur untuk memudahkan penyelesaian hutang.",
+    tech: ["React.js", "Tailwind CSS", "Firebase", "JavaScript"],
+    role: "Frontend Developer"
   },
 ];
 export default function Projects() {

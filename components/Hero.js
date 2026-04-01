@@ -13,7 +13,7 @@ export default function Hero() {
       {/* Hide navbar saat CV modal muncul */}
       {showCV && <style>{`body { overflow: hidden; } nav { visibility: hidden !important; pointer-events: none; } .custom-cursor { display: none !important; }`}</style>}
       
-      <section className={`py-20 px-6 max-w-5xl mx-auto text-center md:text-left transition-colors ${
+      <section className={`py-32 px-6 max-w-5xl mx-auto text-center md:text-left transition-colors ${
         isDark ? 'bg-slate-900/30' : 'bg-white/50'
       }`}>
         <h1 className={`text-5xl md:text-7xl font-bold mb-6 ${

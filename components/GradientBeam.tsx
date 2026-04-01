@@ -30,6 +30,13 @@ const BEAMS_CONFIG: Beam[] = [
   { yBase: 0.94, progress: -0.15, speed: 0.0014, width: 1480, opacity: 0.65, delay: 0,  amplitude: 28, frequency: 0.012, phase: 1.5, phaseSpeed: 0.018 },
   { yBase: 1.00, progress: 0.35,  speed: 0.0013, width: 1600, opacity: 0.60, delay: 0,  amplitude: 30, frequency: 0.011, phase: 2.8, phaseSpeed: 0.016 },
   { yBase: 1.06, progress: 0.15,  speed: 0.0015, width: 1520, opacity: 0.68, delay: 0,  amplitude: 35, frequency: 0.010, phase: 0.9, phaseSpeed: 0.019 },
+  { yBase: 1.15, progress: 0.55,  speed: 0.0012, width: 1600, opacity: 0.65, delay: 0,  amplitude: 32, frequency: 0.012, phase: 1.8, phaseSpeed: 0.017 },
+  { yBase: 1.25, progress: -0.20,  speed: 0.0014, width: 1500, opacity: 0.63, delay: 0,  amplitude: 28, frequency: 0.011, phase: 3.2, phaseSpeed: 0.016 },
+  { yBase: 1.35, progress: 0.40,  speed: 0.0013, width: 1550, opacity: 0.66, delay: 0,  amplitude: 33, frequency: 0.012, phase: 1.4, phaseSpeed: 0.018 },
+  { yBase: 1.45, progress: 0.10,  speed: 0.0015, width: 1480, opacity: 0.64, delay: 0,  amplitude: 29, frequency: 0.011, phase: 2.7, phaseSpeed: 0.015 },
+  { yBase: 1.55, progress: 0.60,  speed: 0.0012, width: 1620, opacity: 0.67, delay: 0,  amplitude: 34, frequency: 0.013, phase: 0.6, phaseSpeed: 0.019 },
+  { yBase: 1.65, progress: -0.10,  speed: 0.0014, width: 1500, opacity: 0.62, delay: 0,  amplitude: 31, frequency: 0.010, phase: 3.0, phaseSpeed: 0.016 },
+  { yBase: 2.10, progress: 0.35,  speed: 0.0013, width: 1560, opacity: 0.65, delay: 0,  amplitude: 27, frequency: 0.012, phase: 1.9, phaseSpeed: 0.017 },
 ];
 
 export default function GradientBeam() {

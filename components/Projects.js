@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { X, ExternalLink } from 'lucide-react';
 import { useTheme } from '@/app/ThemeProvider';
 
 const projects = [
@@ -115,29 +115,61 @@ const projects = [
 export default function Projects() {
   const { isDark } = useTheme();
   const [activeProjectIndex, setActiveProjectIndex] = useState(null);
-  const [animating, setAnimating] = useState(false);
+  const [modalPhase, setModalPhase] = useState('closed'); // 'closed' | 'opening' | 'open' | 'closing'
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [clickOrigin, setClickOrigin] = useState({ x: '50%', y: '50%' });
+  const [contentVisible, setContentVisible] = useState(false);
   const [cursorPreview, setCursorPreview] = useState({ visible: false, x: 0, y: 0, img: '', title: '' });
+  const closeTimerRef = useRef(null);
+  const openTimerRef = useRef(null);
 
   const activeProject = activeProjectIndex !== null ? projects[activeProjectIndex] : null;
   const activeImages = activeProject?.images?.length ? activeProject.images : [];
 
-  const openModal = (index) => {
+  const openModal = (index, e) => {
+    clearTimeout(closeTimerRef.current);
+    clearTimeout(openTimerRef.current);
+
+    // Capture click position as percentage of viewport for clip-path origin
+    const x = `${((e.clientX / window.innerWidth) * 100).toFixed(1)}%`;
+    const y = `${((e.clientY / window.innerHeight) * 100).toFixed(1)}%`;
+    setClickOrigin({ x, y });
     setActiveProjectIndex(index);
     setActiveSlideIndex(0);
-    // trigger animasi setelah mount
+    setContentVisible(false);
+    setModalPhase('closed');
+
+    // Important: start from collapsed state first, then animate to expanded on next frame
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => setAnimating(true));
+      requestAnimationFrame(() => setModalPhase('opening'));
     });
+
+    // After circle fully expands, mark as open & fade in content
+    openTimerRef.current = setTimeout(() => {
+      setModalPhase('open');
+      setTimeout(() => setContentVisible(true), 60);
+    }, 600);
   };
 
   const closeModal = () => {
-    setAnimating(false);
-    setTimeout(() => {
+    clearTimeout(closeTimerRef.current);
+    clearTimeout(openTimerRef.current);
+
+    setContentVisible(false);
+    setModalPhase('closing');
+    closeTimerRef.current = setTimeout(() => {
+      setModalPhase('closed');
       setActiveProjectIndex(null);
       setActiveSlideIndex(0);
-    }, 400);
+    }, 550);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(closeTimerRef.current);
+      clearTimeout(openTimerRef.current);
+    };
+  }, []);
 
   const goToPrevSlide = () => setActiveSlideIndex((prev) => (prev - 1 + activeImages.length) % activeImages.length);
   const goToNextSlide = () => setActiveSlideIndex((prev) => (prev + 1) % activeImages.length);
@@ -162,22 +194,66 @@ export default function Projects() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [activeProjectIndex, activeImages.length]);
 
+  // Compute clip-path values per phase
+  const origin = `${clickOrigin.x} ${clickOrigin.y}`;
+  const clipExpanded = `circle(150% at ${origin})`;
+  const clipCollapsed = `circle(0% at ${origin})`;
+
+  const overlayStyle = {
+    clipPath: modalPhase === 'opening' || modalPhase === 'open' ? clipExpanded : clipCollapsed,
+    transition: modalPhase === 'opening'
+      ? 'clip-path 0.6s cubic-bezier(0.76, 0, 0.24, 1)'
+      : modalPhase === 'closing'
+      ? 'clip-path 0.55s cubic-bezier(0.76, 0, 0.24, 1)'
+      : 'none',
+  };
+
+  const isModalVisible = activeProjectIndex !== null;
+
   return (
     <>
       <style>{`
-        @keyframes blob-in {
-          0%   { transform: translate(60vw, 20vh) scale(0.08); border-radius: 50%; opacity: 0.7; }
-          60%  { border-radius: 50%; opacity: 1; }
-          80%  { transform: translate(0, 0) scale(1.04); border-radius: 20px; }
-          100% { transform: translate(0, 0) scale(1);    border-radius: 16px; }
+        @keyframes content-in {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes blob-out {
-          0%   { transform: translate(0, 0) scale(1);    border-radius: 16px; opacity: 1; }
-          40%  { border-radius: 50%; }
-          100% { transform: translate(60vw, 20vh) scale(0.08); border-radius: 50%; opacity: 0; }
+        @keyframes panel-in {
+          0% {
+            opacity: 0;
+            transform: translateY(22px) scale(0.98) rotateX(3deg);
+            filter: blur(2px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotateX(0);
+            filter: blur(0);
+          }
         }
-        .modal-blob-in  { animation: blob-in  0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .modal-blob-out { animation: blob-out 0.4s  cubic-bezier(0.4, 0, 0.6, 1)       forwards; }
+        @keyframes panel-out {
+          0% {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotateX(0);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(18px) scale(0.985) rotateX(2deg);
+            filter: blur(2px);
+          }
+        }
+        .content-reveal {
+          animation: content-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .modal-panel-fx-in {
+          animation: panel-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          transform-origin: 50% 60%;
+          will-change: transform, opacity, filter;
+        }
+        .modal-panel-fx-out {
+          animation: panel-out 0.35s cubic-bezier(0.4, 0, 1, 1) forwards;
+          transform-origin: 50% 60%;
+          will-change: transform, opacity, filter;
+        }
       `}</style>
 
       <section id="projects" className="flex items-center min-h-screen px-6">
@@ -193,7 +269,7 @@ export default function Projects() {
               <button
                 key={i}
                 type="button"
-                onClick={() => openModal(i)}
+                onClick={(e) => openModal(i, e)}
                 onMouseEnter={() => handleMouseEnter(p.images[0], p.title)}
                 onMouseLeave={handleMouseLeave}
                 onMouseMove={handleMouseMove}
@@ -243,139 +319,178 @@ export default function Projects() {
         </div>
       )}
 
-      {/* Modal — fullscreen dengan blob animation */}
-      {activeProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
+      {/* ── Clip-path fullscreen overlay ── */}
+      {isModalVisible && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-[2px]"
+          style={{
+            ...overlayStyle,
+            willChange: 'clip-path',
+          }}
+        >
+          {/* Inner modal panel — centered, sized */}
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            style={{
-              opacity: animating ? 1 : 0,
-              transition: 'opacity 0.4s ease',
-            }}
+            className="absolute inset-0 flex items-center justify-center"
             onClick={closeModal}
-          />
-
-          {/* Modal panel */}
-          <div
-            className={`relative bg-black border overflow-hidden ${
-              animating ? 'modal-blob-in' : 'modal-blob-out'
-            } ${isDark ? 'border-slate-700' : 'border-slate-800'}`}
-            style={{ width: '92vw', height: '90vh', maxWidth: '1100px' }}
-            onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={closeModal}
-              className="absolute top-5 right-5 z-10 rounded-full w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-            >
-              <X size={16} />
-            </button>
+            {activeProject && (
+              <div
+                className={`relative bg-[#0d0d14] border border-slate-800 overflow-hidden rounded-2xl shadow-[0_30px_120px_rgba(0,0,0,0.65)] ${
+                  modalPhase === 'closing' ? 'modal-panel-fx-out' : 'modal-panel-fx-in'
+                }`}
+                style={{ width: '92vw', height: '90vh', maxWidth: '1100px' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close button */}
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className={`absolute top-5 right-5 z-10 rounded-full w-9 h-9 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors ${
+                    contentVisible ? 'content-reveal' : 'opacity-0'
+                  }`}
+                >
+                  <X size={16} />
+                </button>
 
-            <div className="flex h-full">
-              {/* Kiri: gambar — 45% lebar */}
-              <div className="w-[45%] flex-shrink-0 bg-slate-900 flex flex-col">
-                <div className="flex-1 flex items-center justify-center overflow-hidden">
-                  {activeImages.length > 0 ? (
-                    <img
-                      src={activeImages[activeSlideIndex]}
-                      alt={`${activeProject.title} slide ${activeSlideIndex + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-3 text-slate-600">
-                      <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl">
-                        🖼
-                      </div>
-                      <p className="text-sm">Belum ada gambar</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Slide nav */}
-                {activeImages.length > 1 && (
-                  <div className="flex items-center justify-between px-5 py-4 border-t border-slate-800">
-                    <button type="button" onClick={goToPrevSlide}
-                      className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800 transition-colors">
-                      <ChevronLeft size={12} /> Prev
-                    </button>
-                    <div className="flex items-center gap-1.5">
-                      {activeImages.map((_, i) => (
-                        <button key={i} type="button" onClick={() => setActiveSlideIndex(i)}
-                          className={`h-1.5 rounded-full transition-all ${i === activeSlideIndex ? 'w-4 bg-blue-500' : 'w-1.5 bg-slate-700'}`}
-                        />
-                      ))}
-                    </div>
-                    <button type="button" onClick={goToNextSlide}
-                      className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:bg-slate-800 transition-colors">
-                      Next <ChevronRight size={12} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Kanan: detail — 55% lebar */}
-              <div className="flex-1 flex flex-col overflow-hidden border-l border-slate-800">
-                {/* Header */}
-                <div className="px-8 py-6 border-b border-slate-800">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 mb-2">
-                    {activeProject.category}
-                  </p>
-                  <h3 className="text-3xl font-light text-white tracking-tight">
-                    {activeProject.title}
-                  </h3>
-                  <p className="text-sm text-slate-500 mt-1">{activeProject.role}</p>
-                </div>
-
-                {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col gap-7">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Tentang</p>
-                    <p className="text-base leading-relaxed text-slate-300">{activeProject.desc}</p>
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Tech Stack</p>
-                    <div className="flex flex-wrap gap-2">
-                      {activeProject.tech.map((t) => (
-                        <span key={t} className="text-xs px-3 py-1.5 rounded-full font-medium bg-blue-900/30 text-blue-300 border border-blue-800/60">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Kontribusi</p>
-                    <ul className="flex flex-col gap-3">
-                      {activeProject.whatIDid.map((item, i) => (
-                        <li key={i} className="flex gap-3 items-start">
-                          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                          <span className="text-sm leading-relaxed text-slate-300">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="px-8 py-5 border-t border-slate-800 flex items-center justify-between">
-                  <span className="text-xs text-slate-600">
-                    {activeProjectIndex + 1} / {projects.length}
-                  </span>
-                  
-                  <a
-                    href={activeProject.github}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-lg bg-white text-slate-900 hover:bg-slate-100 transition-colors"
+                <div className="flex h-full">
+                  {/* ── Left: image panel ── */}
+                  <div
+                    className={`w-[45%] flex-shrink-0 bg-[#080810] flex flex-col ${
+                      contentVisible ? 'content-reveal' : 'opacity-0'
+                    }`}
                   >
-                    <ExternalLink size={14} /> Lihat GitHub
-                  </a>
+                    <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
+                      {activeImages.length > 0 ? (
+                        <img
+                          key={activeSlideIndex}
+                          src={activeImages[activeSlideIndex]}
+                          alt={`${activeProject.title} slide ${activeSlideIndex + 1}`}
+                          className="w-full h-full object-contain rounded-xl"
+                          style={{ animation: 'content-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards' }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-3 text-slate-600">
+                          <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl">🖼</div>
+                          <p className="text-sm">Belum ada gambar</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Thumbnail strip + circle nav */}
+                    {activeImages.length > 1 && (
+                      <div className="flex items-center gap-2 px-4 pb-4">
+                        {activeImages.map((img, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setActiveSlideIndex(i)}
+                            className={`w-14 h-10 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all duration-200 ${
+                              i === activeSlideIndex
+                                ? 'border-blue-500 opacity-100 scale-105'
+                                : 'border-transparent opacity-40 hover:opacity-70'
+                            }`}
+                          >
+                            <img src={img} alt="" className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                        <div className="ml-auto flex gap-1.5">
+                          <button
+                            onClick={goToPrevSlide}
+                            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center text-base leading-none"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            onClick={goToNextSlide}
+                            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center text-base leading-none"
+                          >
+                            ›
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── Right: detail panel ── */}
+                  <div
+                    className={`flex-1 flex flex-col overflow-hidden border-l border-slate-800 ${
+                      contentVisible ? 'content-reveal' : 'opacity-0'
+                    }`}
+                    style={{ animationDelay: contentVisible ? '60ms' : '0ms' }}
+                  >
+                    {/* Top bar */}
+                    <div className="px-8 py-6 border-b border-slate-800">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 mb-2">
+                        {activeProject.category}
+                      </p>
+                      <h3 className="text-3xl font-light text-white tracking-tight">
+                        {activeProject.title}
+                      </h3>
+                      <p className="text-sm text-slate-500 mt-1">{activeProject.role}</p>
+                    </div>
+
+                    {/* Scrollable content */}
+                    <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col gap-7">
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Tentang</p>
+                        <p className="text-base leading-relaxed text-slate-300">{activeProject.desc}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Tech Stack</p>
+                        <div className="flex flex-wrap gap-2">
+                          {activeProject.tech.map((t) => (
+                            <span key={t} className="text-xs px-3 py-1.5 rounded-full font-medium bg-blue-900/30 text-blue-300 border border-blue-800/60">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600 mb-3">Kontribusi</p>
+                        <ul className="flex flex-col gap-3">
+                          {activeProject.whatIDid.map((item, i) => (
+                            <li key={i} className="flex gap-3 items-start">
+                              <span className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                              <span className="text-sm leading-relaxed text-slate-300">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="px-8 py-5 border-t border-slate-800 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-slate-600">
+                          {activeProjectIndex + 1} / {projects.length}
+                        </span>
+                        <div className="flex gap-1.5">
+                          <button
+                            onClick={() => { setActiveProjectIndex((activeProjectIndex - 1 + projects.length) % projects.length); setActiveSlideIndex(0); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-white/70 hover:bg-white/10 text-xs transition-all"
+                          >
+                            ← Prev
+                          </button>
+                          <button
+                            onClick={() => { setActiveProjectIndex((activeProjectIndex + 1) % projects.length); setActiveSlideIndex(0); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-white/70 hover:bg-white/10 text-xs transition-all"
+                          >
+                            Next →
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <a href={activeProject.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-lg bg-white text-slate-900 hover:bg-slate-100 transition-colors"
+                      >
+                        <ExternalLink size={14} /> Lihat GitHub
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

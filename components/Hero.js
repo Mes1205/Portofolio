@@ -5,6 +5,7 @@ import { useTheme } from '@/app/ThemeProvider';
 
 export default function Hero() {
   const [showCV, setShowCV] = useState(false);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
   const { isDark } = useTheme();
 
   return (
@@ -27,7 +28,15 @@ export default function Hero() {
               <h1 className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
                 isDark ? 'text-white' : 'text-slate-900'
               }`}>
-                Hi, I'm <span className="text-blue-500">Martha.</span>
+                Hi, I&apos;m{' '}
+                <span
+                  className={isProfileHovered ? 'text-transparent' : 'text-blue-500'}
+                  style={isProfileHovered ? { WebkitTextStroke: '1px #3b82f6' } : undefined}
+                  onMouseEnter={() => setIsProfileHovered(true)}
+                  onMouseLeave={() => setIsProfileHovered(false)}
+                >
+                  Martha.
+                </span>
               </h1>
               <p className={`text-lg md:text-xl max-w-xl leading-relaxed mb-10 ${
                 isDark ? 'text-slate-300' : 'text-slate-600'
@@ -63,13 +72,17 @@ export default function Hero() {
 
             {/* Kanan: foto */}
             <div className="flex-shrink-0 flex flex-col items-center gap-4">
-              <div className={`w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-4 shadow-xl ${
-                isDark
-                  ? 'border-blue-500/20 shadow-blue-500/10'
-                  : 'border-slate-200 shadow-slate-200/50'
-              }`}>
+              <div
+                onMouseEnter={() => setIsProfileHovered(true)}
+                onMouseLeave={() => setIsProfileHovered(false)}
+                className={`w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-4 shadow-xl ${
+                  isDark
+                    ? 'border-blue-500/20 shadow-blue-500/10'
+                    : 'border-slate-200 shadow-slate-200/50'
+                }`}
+              >
                 <img
-                  src="/images/foto-martha.jpg"
+                  src={isProfileHovered ? '/images/informal.png' : '/images/formal.png'}
                   alt="Martha Meslina Florencia"
                   className="w-full h-full object-cover object-top"
                 />

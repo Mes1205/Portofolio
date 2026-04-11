@@ -1,22 +1,19 @@
 "use client";
 
-import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { Send, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/app/ThemeProvider';
 
 export default function Navbar() {
-  const router = useRouter();
-  const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0, opacity: 0 });
-  const navRef = useRef<HTMLDivElement>(null);
+  const linksWrapRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const navLinks = [
-    { label: 'Home',       href: '/' },
+    { label: 'Home',       href: '#hero' },
     { label: 'Projects',   href: '#projects' },
     { label: 'Experience', href: '#experience' },
     { label: 'Skills',     href: '#skills' },
@@ -30,36 +27,71 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Update highlight position to match the active link element exactly
-  useEffect(() => {
+  const updateHighlight = () => {
     const activeEl = linkRefs.current[activeIndex];
-    const navEl = navRef.current;
-    if (!activeEl || !navEl) return;
+    const wrapEl = linksWrapRef.current;
+    if (!activeEl || !wrapEl) return;
 
-    const navRect = navEl.getBoundingClientRect();
+    const wrapRect = wrapEl.getBoundingClientRect();
     const linkRect = activeEl.getBoundingClientRect();
 
     setHighlightStyle({
-      left: linkRect.left - navRect.left -350, // 12px padding offset
+      left: linkRect.left - wrapRect.left - 12,
       width: linkRect.width + 24,
       opacity: 1,
     });
+  };
+
+  // Update highlight position to match the active link element exactly
+  useEffect(() => {
+    updateHighlight();
+    window.addEventListener('resize', updateHighlight);
+    return () => window.removeEventListener('resize', updateHighlight);
   }, [activeIndex]);
+
+  // Follow active section while scrolling in <main>
+  useEffect(() => {
+    const mainEl = document.querySelector('main');
+    if (!mainEl) return;
+
+    const sectionIds = navLinks.map((l) => l.href.replace('#', ''));
+    const sectionToIndex = new Map(sectionIds.map((id, idx) => [id, idx]));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visible.length === 0) return;
+        const id = visible[0].target.id;
+        const idx = sectionToIndex.get(id);
+        if (typeof idx === 'number') setActiveIndex(idx);
+      },
+      {
+        root: mainEl,
+        threshold: [0.35, 0.5, 0.7],
+      }
+    );
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
     setActiveIndex(index);
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      const element = document.querySelector(href);
-      element?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      router.push(href);
-    }
+    e.preventDefault();
+    const element = document.querySelector(href);
+    element?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <nav className="fixed top-[12px] left-0 right-0 z-[100] flex justify-center px-4 transition-all duration-300">
-      <div className="relative w-full max-w-[1000px] h-[53px]" ref={navRef}>
+      <div className="relative w-full max-w-[1000px] h-[53px]">
 
         {/* Glass Background */}
         <div
@@ -89,7 +121,7 @@ export default function Navbar() {
         </div>
 
         {/* Navigation Links */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-[40px]">
+        <div ref={linksWrapRef} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:flex items-center gap-[40px]">
           {navLinks.map((link, index) => (
             <a
               key={link.href}

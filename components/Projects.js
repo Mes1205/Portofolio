@@ -48,7 +48,8 @@ const projects = [
       "Riset UX untuk memastikan UI tetap mudah digunakan dalam kondisi panik."
     ],
     github: "https://github.com/",
-    images: ["/images/seluna-1.png", "/images/seluna-2.png"]
+    figma: "https://www.figma.com/proto/JvMTFzw8OcdHNpHPlAEOU9/SAFE-ROUTE?node-id=2448-2547&t=5FiRPWNG9AhMzt3b-1&show-proto-sidebar=1&starting-point-node-id=2448%3A2547",
+    images: ["/images/seluna-1.png", "/images/seluna-2.png", "/images/seluna-3.png", "/images/seluna-4.png"]
   },
   {
     title: "Addicx",
@@ -63,7 +64,8 @@ const projects = [
       "Mendesain onboarding personal berdasarkan jenis dan tingkat kecanduan pengguna."
     ],
     github: "https://github.com/",
-    images: ["/images/addicx-1.png", "/images/addicx-2.png"]
+    figma: "https://www.figma.com/proto/qgzar1T7KzT0bhf9XK6AZo/Gemastik?node-id=2982-17581&t=lUKgyPthXwiv5z3e-1&starting-point-node-id=2982%3A17745&show-proto-sidebar=1",
+    images: ["/images/addicx-1.png", "/images/addicx-2.png", "/images/addicx-3.png", "/images/addicx-4.png"]
   },
   {
     title: "Grammate",
@@ -119,7 +121,7 @@ export default function Projects() {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [clickOrigin, setClickOrigin] = useState({ x: '50%', y: '50%' });
   const [contentVisible, setContentVisible] = useState(false);
-  const [cursorPreview, setCursorPreview] = useState({ visible: false, x: 0, y: 0, img: '', title: '' });
+  const [cursorPreview, setCursorPreview] = useState({ visible: false, x: 0, y: 0, img: '', width: 192, height: 128 });
   const closeTimerRef = useRef(null);
   const openTimerRef = useRef(null);
 
@@ -174,12 +176,33 @@ export default function Projects() {
   const goToPrevSlide = () => setActiveSlideIndex((prev) => (prev - 1 + activeImages.length) % activeImages.length);
   const goToNextSlide = () => setActiveSlideIndex((prev) => (prev + 1) % activeImages.length);
 
-  const handleMouseEnter = (img, title) => setCursorPreview(p => ({ ...p, visible: true, img, title }));
+  const handleMouseEnter = (img) => {
+    const fallback = { width: 192, height: 128 };
+
+    const previewImg = new window.Image();
+    previewImg.onload = () => {
+      const naturalW = previewImg.naturalWidth || fallback.width;
+      const naturalH = previewImg.naturalHeight || fallback.height;
+
+      const maxW = 300;
+      const maxH = 300;
+      const scale = Math.min(maxW / naturalW, maxH / naturalH, 1);
+
+      const width = Math.max(120, Math.round(naturalW * scale));
+      const height = Math.max(90, Math.round(naturalH * scale));
+
+      setCursorPreview((p) => ({ ...p, visible: true, img, width, height }));
+    };
+    previewImg.onerror = () => {
+      setCursorPreview((p) => ({ ...p, visible: true, img, ...fallback }));
+    };
+    previewImg.src = img;
+  };
   const handleMouseLeave = () => setCursorPreview(p => ({ ...p, visible: false }));
   const handleMouseMove = (e) => {
     let x = e.clientX + 20, y = e.clientY - 20;
-    if (x + 180 > window.innerWidth) x = e.clientX - 200;
-    if (y + 130 > window.innerHeight) y = e.clientY - 150;
+    if (x + cursorPreview.width > window.innerWidth) x = e.clientX - cursorPreview.width - 20;
+    if (y + cursorPreview.height > window.innerHeight) y = e.clientY - cursorPreview.height - 20;
     setCursorPreview(p => ({ ...p, x, y }));
   };
 
@@ -270,7 +293,7 @@ export default function Projects() {
                 key={i}
                 type="button"
                 onClick={(e) => openModal(i, e)}
-                onMouseEnter={() => handleMouseEnter(p.images[0], p.title)}
+                onMouseEnter={() => handleMouseEnter(p.images[0])}
                 onMouseLeave={handleMouseLeave}
                 onMouseMove={handleMouseMove}
                 className={`group w-full flex items-center justify-between py-7 border-b text-left transition-all duration-300 ${
@@ -309,13 +332,10 @@ export default function Projects() {
       {/* Cursor Preview */}
       {cursorPreview.visible && (
         <div
-          className="fixed pointer-events-none z-[9999] w-48 h-32 rounded-xl overflow-hidden border border-blue-500/20 shadow-2xl"
-          style={{ left: cursorPreview.x, top: cursorPreview.y }}
+          className="fixed pointer-events-none z-[9999] rounded-xl overflow-hidden border border-blue-500/20 shadow-2xl"
+          style={{ left: cursorPreview.x, top: cursorPreview.y, width: cursorPreview.width, height: cursorPreview.height }}
         >
           <img src={cursorPreview.img} alt="" className="w-full h-full object-cover" />
-          <div className="absolute bottom-0 left-0 right-0 bg-slate-900/80 text-blue-300 text-[10px] px-2 py-1 font-semibold">
-            {cursorPreview.title}
-          </div>
         </div>
       )}
 
@@ -479,12 +499,12 @@ export default function Projects() {
                         </div>
                       </div>
                       
-                      <a href={activeProject.github}
+                      <a href={activeProject.figma || activeProject.github}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-lg bg-white text-slate-900 hover:bg-slate-100 transition-colors"
                       >
-                        <ExternalLink size={14} /> Lihat GitHub
+                        <ExternalLink size={14} /> {activeProject.figma ? 'Lihat Figma' : 'Lihat GitHub'}
                       </a>
                     </div>
                   </div>

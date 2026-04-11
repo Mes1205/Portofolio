@@ -3,6 +3,56 @@
 import { useState } from 'react';
 import { useTheme } from '@/app/ThemeProvider';
 
+const keyframes = `
+  @keyframes wave {
+    0%   { transform: rotate(0deg); }
+    15%  { transform: rotate(18deg); }
+    30%  { transform: rotate(-8deg); }
+    45%  { transform: rotate(16deg); }
+    60%  { transform: rotate(-4deg); }
+    75%  { transform: rotate(12deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  @keyframes spinEnterRight {
+    0%   { opacity: 0; transform: rotate(-360deg) scale(0.2) translateX(-40px); }
+    60%  { opacity: 1; transform: rotate(20deg) scale(1.15) translateX(4px); }
+    80%  { transform: rotate(-8deg) scale(0.97) translateX(0px); }
+    100% { opacity: 1; transform: rotate(0deg) scale(1) translateX(0px); }
+  }
+
+  @keyframes spinEnterLeft {
+    0%   { opacity: 0; transform: scaleX(-1) rotate(-360deg) scale(0.2) translateX(-40px); }
+    60%  { opacity: 1; transform: scaleX(-1) rotate(20deg) scale(1.15) translateX(4px); }
+    80%  { transform: scaleX(-1) rotate(-8deg) scale(0.97) translateX(0px); }
+    100% { opacity: 1; transform: scaleX(-1) rotate(0deg) scale(1) translateX(0px); }
+  }
+
+  .wave-hand-right {
+    display: inline-block;
+    font-size: 5rem;
+    line-height: 1;
+    user-select: none;
+    transform-origin: 10% 70%;
+    will-change: transform;
+    animation:
+      spinEnterRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both,
+      wave 2s ease-in-out 1.2s infinite;
+  }
+
+  .wave-hand-left {
+    display: inline-block;
+    font-size: 5rem;
+    line-height: 1;
+    user-select: none;
+    transform-origin: 10% 70%;
+    will-change: transform;
+    animation:
+      spinEnterLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both,
+      wave 2s ease-in-out 1.5s infinite;
+  }
+`;
+
 export default function Hero() {
   const [showCV, setShowCV] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
@@ -10,6 +60,8 @@ export default function Hero() {
 
   return (
     <>
+      <style>{keyframes}</style>
+
       {showCV && (
         <style>{`body { overflow: hidden; } nav { visibility: hidden !important; pointer-events: none; } .custom-cursor { display: none !important; }`}</style>
       )}
@@ -70,26 +122,41 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Kanan: foto */}
+            {/* Kanan: foto + waving hands */}
             <div className="flex-shrink-0 flex flex-col items-center gap-4">
-              <div
-                onMouseEnter={() => setIsProfileHovered(true)}
-                onMouseLeave={() => setIsProfileHovered(false)}
-                className={`w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-4 shadow-xl ${
-                  isDark
-                    ? 'border-blue-500/20 shadow-blue-500/10'
-                    : 'border-slate-200 shadow-slate-200/50'
-                }`}
-              >
-                <img
-                  src={isProfileHovered ? '/images/informal.png' : '/images/formal.png'}
-                  alt="Martha Meslina Florencia"
-                  className="w-full h-full object-cover object-top"
-                />
+
+              {/* Foto + tangan kiri & kanan */}
+              <div className="flex items-center gap-3">
+
+                {/* Tangan kiri — spin masuk lebih lambat */}
+                <span className="wave-hand-left" aria-hidden="true">👋</span>
+
+                {/* Foto */}
+                <div
+                  onMouseEnter={() => setIsProfileHovered(true)}
+                  onMouseLeave={() => setIsProfileHovered(false)}
+                  className={`w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-4 shadow-xl ${
+                    isDark
+                      ? 'border-blue-500/20 shadow-blue-500/10'
+                      : 'border-slate-200 shadow-slate-200/50'
+                  }`}
+                >
+                  <img
+                    src={isProfileHovered ? '/images/informal.png' : '/images/formal.png'}
+                    alt="Martha Meslina Florencia"
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+
+                {/* Tangan kanan — spin masuk duluan */}
+                <span className="wave-hand-right" aria-hidden="true">👋</span>
+
               </div>
+
+              {/* GitHub & LinkedIn */}
               <div className="flex gap-3">
-                <a
-                  href="https://github.com/Mes1205"
+                
+                <a  href="https://github.com/Mes1205"
                   target="_blank"
                   rel="noreferrer"
                   className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium ${
@@ -100,8 +167,8 @@ export default function Hero() {
                 >
                   GitHub
                 </a>
-                <a
-                  href="https://www.linkedin.com/in/martha-meslina"
+                
+                 <a href="https://www.linkedin.com/in/martha-meslina"
                   target="_blank"
                   rel="noreferrer"
                   className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium ${
@@ -166,7 +233,6 @@ export default function Hero() {
               >
                 Tutup
               </button>
-              
               <a
                 href="/cv/CV_MarthaMeslinaFlorencia.pdf"
                 download

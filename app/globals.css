@@ -24,6 +24,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins), sans-serif;
   cursor: url('/cursor-normal.svg') 16 16, auto;
+  transition: background-color 700ms ease-in-out, color 700ms ease-in-out;
 }
 
 /* Kursor berubah saat diarahkan ke tombol atau link */

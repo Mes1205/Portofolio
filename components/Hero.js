@@ -94,15 +94,7 @@ export default function Hero() {
               <p className={`text-lg md:text-xl max-w-xl leading-relaxed mb-10 ${
                 isDark ? 'text-slate-300' : 'text-slate-700'
               }`}>
-                Seorang Informatics Engineering student yang berfokus pada{' '}
-                <span className={isDark ? 'text-white font-semibold' : 'text-slate-900 font-semibold'}>
-                  Web Development
-                </span>{' '}
-                dan{' '}
-                <span className={isDark ? 'text-white font-semibold' : 'text-slate-900 font-semibold'}>
-                  Artificial Intelligence
-                </span>.
-                Suka membangun antarmuka yang intuitif dan sistem yang cerdas.
+                Crafting the future of web and AI. From developing educational chatbots to AR-based learning, I'm passionate about building tech that enhances user experiences.
               </p>
               <div className="flex gap-4 justify-center md:justify-start flex-wrap">
                 <button

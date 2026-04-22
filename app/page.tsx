@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <main
-      className={`relative transition-colors duration-300 ${
+      className={`relative transition-colors duration-700 ease-in-out ${
         isDark ? 'bg-black' : 'bg-white'
       }`}
       style={{
@@ -23,13 +23,16 @@ export default function Home() {
       }}
     >
       {/* GradientBeam */}
-      <div className="fixed inset-0 z-0 pointer-events-none" style={{ opacity: 0.35 }}>
+      <div
+        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-700 ease-in-out"
+        style={{ opacity: isDark ? 0.42 : 0.62 }}
+      >
         <GradientBeam />
       </div>
 
       {/* Overlay biar teks terbaca */}
-      <div className={`fixed inset-0 z-[1] pointer-events-none ${
-        isDark ? 'bg-slate-950/40' : 'bg-white/50'
+      <div className={`fixed inset-0 z-[1] pointer-events-none transition-colors duration-700 ease-in-out ${
+        isDark ? 'bg-slate-950/38' : 'bg-white/20'
       }`} />
 
       <div className="relative z-10">

@@ -5,12 +5,14 @@ import { Send, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/app/ThemeProvider';
 
 export default function Navbar() {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, isProjectModalOpen } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
   const linksWrapRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const themeToggleRef = useRef<HTMLButtonElement>(null);
 
   const navLinks = [
     { label: 'Home',       href: '#hero' },
@@ -25,6 +27,21 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const updateSpotlightPosition = () => {
+      if (!themeToggleRef.current) return;
+      const rect = themeToggleRef.current.getBoundingClientRect();
+      setSpotlightPos({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+    };
+
+    updateSpotlightPosition();
+    window.addEventListener('resize', updateSpotlightPosition);
+    return () => window.removeEventListener('resize', updateSpotlightPosition);
   }, []);
 
   const updateHighlight = () => {
@@ -90,7 +107,22 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-[12px] left-0 right-0 z-[100] flex justify-center px-4 transition-all duration-300">
+    <>
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 z-[2] pointer-events-none transition-all duration-700 ease-in-out"
+        style={{
+          background: `radial-gradient(1900px circle at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(255,255,255,1) 0%, rgba(239,246,255,0.86) 22%, rgba(191,219,254,0.56) 42%, rgba(51,65,85,0.46) 70%, rgba(2,6,23,0.76) 100%), linear-gradient(rgba(2,6,23,0.4), rgba(2,6,23,0.4))`,
+          opacity: isDark ? 0 : 0.86,
+        }}
+      />
+
+      <nav
+        className={`fixed top-[12px] left-0 right-0 z-[100] flex justify-center px-4 transition-all duration-300 ${
+          isProjectModalOpen ? 'pointer-events-none opacity-0 -translate-y-2' : 'pointer-events-auto opacity-100 translate-y-0'
+        }`}
+        aria-hidden={isProjectModalOpen}
+      >
       <div className="relative w-full max-w-[1000px] h-[53px]">
 
         {/* Glass Background */}
@@ -155,6 +187,7 @@ export default function Navbar() {
         <div className="absolute right-[10px] top-1/2 -translate-y-1/2 flex items-center gap-3">
           {/* Theme Toggle */}
           <button
+            ref={themeToggleRef}
             onClick={toggleTheme}
             className={`h-[34px] w-[34px] rounded-full flex items-center justify-center transition-all hover:scale-110 ${
               isDark 
@@ -170,7 +203,7 @@ export default function Navbar() {
           <div
             className="h-[34px] px-5 rounded-[26px] flex items-center justify-center cursor-pointer transition-transform active:scale-95 hover:opacity-90"
             style={{ background: isDark ? '#60a5fa' : '#1e1b4b' }}
-            onClick={() => window.location.href = 'mailto:emailkamu@gmail.com'}
+            onClick={() => window.location.href = 'mailto:mmeslinafs@gmail.com'}
           >
             <p className="text-[12px] font-bold text-white flex items-center gap-2">
               Let&apos;s Talk <Send size={14} />
@@ -178,6 +211,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-    </nav>
+      </nav>
+    </>
   );
 }

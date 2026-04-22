@@ -70,7 +70,7 @@ export default function Experience() {
                   <h3 className={`text-2xl font-semibold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {job.title}
                   </h3>
-                  <p className={`text-base mb-4 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <p className={`text-base mb-4 ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>
                     {job.place}
                   </p>
                   {job.skills && (
@@ -91,7 +91,7 @@ export default function Experience() {
                   )}
                 </div>
                 <p className={`font-mono text-sm mt-4 md:mt-0 md:ml-8 ${
-                  isDark ? 'text-slate-500' : 'text-slate-400'
+                  isDark ? 'text-slate-500' : 'text-slate-600'
                 }`}>
                   {job.year}
                 </p>

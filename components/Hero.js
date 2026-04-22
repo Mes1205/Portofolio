@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { useTheme } from '@/app/ThemeProvider';
 
 const keyframes = `
@@ -91,7 +92,7 @@ export default function Hero() {
                 </span>
               </h1>
               <p className={`text-lg md:text-xl max-w-xl leading-relaxed mb-10 ${
-                isDark ? 'text-slate-300' : 'text-slate-600'
+                isDark ? 'text-slate-300' : 'text-slate-700'
               }`}>
                 Seorang Informatics Engineering student yang berfokus pada{' '}
                 <span className={isDark ? 'text-white font-semibold' : 'text-slate-900 font-semibold'}>
@@ -105,6 +106,7 @@ export default function Hero() {
               </p>
               <div className="flex gap-4 justify-center md:justify-start flex-wrap">
                 <button
+                  onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
                   className={`px-8 py-3 rounded-full font-semibold text-sm tracking-wide transition-all duration-300 text-white ${
                     isDark
                       ? 'bg-blue-600 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-600/40'
@@ -115,7 +117,7 @@ export default function Hero() {
                 </button>
                 <button
                   onClick={() => setShowCV(true)}
-                  className="px-8 py-3 rounded-full font-semibold text-sm tracking-wide text-white bg-blue-500 hover:bg-blue-400 border border-blue-400 hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-300"
+                  className="px-8 py-3 rounded-full font-semibold text-sm tracking-wide text-white bg-blue-600 hover:bg-blue-500 border border-blue-500 hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-300"
                 >
                   Lihat CV
                 </button>
@@ -153,32 +155,69 @@ export default function Hero() {
 
               </div>
 
-              {/* GitHub & LinkedIn */}
-              <div className="flex gap-3">
-                
-                <a  href="https://github.com/Mes1205"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium ${
-                    isDark
-                      ? 'text-blue-400 border-blue-500/30 hover:bg-blue-500/10'
-                      : 'text-slate-600 border-slate-300 hover:bg-slate-100'
-                  }`}
-                >
-                  GitHub
-                </a>
-                
-                 <a href="https://www.linkedin.com/in/martha-meslina"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`text-xs px-4 py-1.5 rounded-full border transition-all font-medium ${
-                    isDark
-                      ? 'text-blue-400 border-blue-500/30 hover:bg-blue-500/10'
-                      : 'text-slate-600 border-slate-300 hover:bg-slate-100'
-                  }`}
-                >
-                  LinkedIn
-                </a>
+              {/* Social links */}
+              <div className="w-full max-w-[330px]">
+                <p className={`text-[11px] uppercase tracking-[0.2em] mb-2 text-center ${
+                  isDark ? 'text-slate-500' : 'text-slate-700'
+                }`}>
+                  My Socials
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <a
+                    href="https://github.com/Mes1205"
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`group rounded-xl border px-3 py-2.5 transition-all duration-300 ${
+                      isDark
+                        ? 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 hover:border-blue-400/50'
+                        : 'border-slate-300 bg-white/80 hover:bg-slate-50 hover:border-slate-400'
+                    }`}
+                    aria-label="GitHub profile Martha Meslina"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
+                        isDark ? 'text-slate-100' : 'text-slate-900'
+                      }`}>
+                        <span className={`w-5 h-5 rounded-full border inline-flex items-center justify-center text-[10px] ${
+                          isDark ? 'border-slate-500 text-slate-200' : 'border-slate-500 text-slate-800'
+                        }`}>GH</span>
+                        GitHub
+                      </span>
+                      <ExternalLink size={12} className={`opacity-70 group-hover:opacity-100 transition-opacity ${
+                        isDark ? 'text-slate-300' : 'text-slate-700'
+                      }`} />
+                    </div>
+                    <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>@Mes1205</p>
+                  </a>
+
+                  <a
+                    href="https://www.linkedin.com/in/martha-meslina"
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`group rounded-xl border px-3 py-2.5 transition-all duration-300 ${
+                      isDark
+                        ? 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10 hover:border-blue-400/50'
+                        : 'border-slate-300 bg-white/80 hover:bg-slate-50 hover:border-slate-400'
+                    }`}
+                    aria-label="LinkedIn profile Martha Meslina"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
+                        isDark ? 'text-slate-100' : 'text-slate-900'
+                      }`}>
+                        <span className={`w-5 h-5 rounded-full border inline-flex items-center justify-center text-[10px] ${
+                          isDark ? 'border-slate-500 text-slate-200' : 'border-slate-500 text-slate-800'
+                        }`}>in</span>
+                        LinkedIn
+                      </span>
+                      <ExternalLink size={12} className={`opacity-70 group-hover:opacity-100 transition-opacity ${
+                        isDark ? 'text-slate-300' : 'text-slate-700'
+                      }`} />
+                    </div>
+                    <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>/in/martha-meslina</p>
+                  </a>
+                </div>
               </div>
             </div>
 

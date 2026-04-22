@@ -6,10 +6,10 @@ export default function Skills() {
 
   const skills = {
     "Frontend": ["React.js", "Next.js", "Tailwind CSS", "TypeScript", "JavaScript", "HTML/CSS"],
-    "Backend": ["Node.js", "Firebase", "REST API", "Database Design"],
-    "Mobile": ["React Native", "Unity", "C#"],
+    "Backend": ["Node.js", "Supabase", "PostgreSQL", "REST API", "Database Design"],
+    "Mobile": ["Unity", "C#"],
     "AI/ML": ["Python", "Machine Learning", "Data Analysis"],
-    "Tools & Others": ["Git", "Figma", "Arduino", "Blender"]
+    "Tools & Others": ["Git", "Figma", "Unity"]
   };
 
   return (
@@ -29,7 +29,7 @@ export default function Skills() {
               }`}
             >
               <h3 className={`text-sm font-semibold uppercase tracking-widest mb-4 ${
-                isDark ? 'text-blue-400' : 'text-blue-600'
+                isDark ? 'text-blue-400' : 'text-blue-700'
               }`}>
                 {category}
               </h3>
@@ -40,7 +40,7 @@ export default function Skills() {
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all cursor-default ${
                       isDark
                         ? 'bg-slate-700/80 text-slate-200 hover:bg-blue-600 hover:text-white'
-                        : 'bg-slate-200 text-slate-700 hover:bg-blue-500 hover:text-white'
+                        : 'bg-slate-200 text-slate-800 font-semibold hover:bg-blue-600 hover:text-white'
                     }`}
                   >
                     {skill}

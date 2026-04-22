@@ -5,12 +5,15 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 interface ThemeContextType {
   isDark: boolean;
   toggleTheme: () => void;
+  isProjectModalOpen: boolean;
+  setProjectModalOpen: (isOpen: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -19,7 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDark, toggleTheme, isProjectModalOpen, setProjectModalOpen: setIsProjectModalOpen }}>
       {children}
     </ThemeContext.Provider>
   );

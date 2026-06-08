@@ -19,7 +19,7 @@ const projects = [
       "Kolaborasi dengan tim desain untuk optimasi UX agar mudah dipakai pemula.",
     ],
     github: "https://github.com/Kelompok-2-IMK/zichara",
-    images: ["/images/zichara-0.jpeg", "/images/zichara-1.jpeg", "/images/zichara-2.jpeg"],
+    images: ["/images/zichara-0.jpeg", "/images/zichara-1.jpeg", "/images/zichara-2.jpeg", "/images/zichara-3.jpeg", "/images/zichara-4.jpeg", "/images/zichara-5.jpeg"],
   },
   {
     title: "Urunin",
@@ -126,6 +126,7 @@ const SCALE_X_STEP = 0.12;
 const SCALE_STEP   = 0.06;
 const OPACITY_STEP = 0.18;
 const VISIBLE_SIDE = 2;
+const CAROUSEL_STEP_MS = 400;
 
 const C = {
   bg:          '#ffffff',
@@ -249,7 +250,13 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
         key={i}
         onMouseEnter={() => { if (!isActive) onActivate(i); setHoveredIndex(i); }}
         onMouseLeave={() => setHoveredIndex(null)}
-        onClick={(e) => { isActive ? onClick(i, e) : onActivate(i); }}
+        onClick={(e) => {
+          if (isActive) {
+            onClick(i, e);
+          } else {
+            onActivate(i);
+          }
+        }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
           width: W, height: H,
@@ -260,7 +267,7 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
           opacity, borderRadius,
           overflow: 'hidden',
           boxShadow: shadow,
-          transition: `transform 1.8s cubic-bezier(0.16,1,0.3,1), opacity 1.8s cubic-bezier(0.16,1,0.3,1), border-radius 1.2s ease, box-shadow 1.2s ease`,
+          transition: `transform 2.35s cubic-bezier(0.16,1,0.3,1), opacity 2.35s cubic-bezier(0.16,1,0.3,1), border-radius 1.7s ease, box-shadow 1.7s ease`,
           willChange: 'transform, opacity',
           backfaceVisibility: 'hidden',
           background: C.bgCard,
@@ -274,7 +281,7 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
             objectFit: 'contain', objectPosition: 'center', display: 'block',
             background: C.bgSurface,
             filter: isActive ? 'none' : `brightness(${Math.max(0.75, 0.95 - absSlot * 0.1)})`,
-            transition: 'filter 1.6s cubic-bezier(0.16,1,0.3,1), transform 1.6s cubic-bezier(0.16,1,0.3,1)',
+            transition: 'filter 2.2s cubic-bezier(0.16,1,0.3,1), transform 2.2s cubic-bezier(0.16,1,0.3,1)',
             transform: isActive && isHov ? 'scale(1.06)' : 'scale(1)',
           }}
         />
@@ -282,7 +289,7 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
           position: 'absolute', inset: 0,
           background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.10) 45%, transparent 60%)',
           opacity: isActive ? 1 : 0,
-          transition: 'opacity 1.6s cubic-bezier(0.16,1,0.3,1)',
+          transition: 'opacity 2.1s cubic-bezier(0.16,1,0.3,1)',
           pointerEvents: 'none',
         }} />
         <div style={{
@@ -290,13 +297,10 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
           padding: '18px 20px',
           opacity: isActive ? 1 : 0,
           transform: isActive ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'opacity 1.6s cubic-bezier(0.16,1,0.3,1), transform 1.6s cubic-bezier(0.16,1,0.3,1)',
+          transition: 'opacity 2.1s cubic-bezier(0.16,1,0.3,1), transform 2.1s cubic-bezier(0.16,1,0.3,1)',
           pointerEvents: 'none',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, transition: 'transform 0.8s cubic-bezier(0.34,1.56,0.64,1)', transform: isHov ? 'translateX(4px)' : 'translateX(0)' }}>
-            {isActive && isHov && (
-              <Sparkles size={16} style={{ color: 'rgba(255,255,255,0.7)', animation: 'sparkle-bounce 1.5s ease-in-out infinite' }} />
-            )}
             <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#fff', letterSpacing: isHov ? '0.04em' : '-0.02em', transition: 'letter-spacing 0.8s ease' }}>{p.title}</p>
             {isActive && isHov && (
               <ArrowUpRight size={16} style={{ color: 'rgba(255,255,255,0.6)', animation: 'arrow-pop 0.8s cubic-bezier(0.34,1.56,0.64,1) infinite alternate' }} />
@@ -398,9 +402,9 @@ function AnimatedTitle({ text, isActive, isHovered, onHover, onLeave, onClick, i
   let dist = Math.abs(index - activeIndex);
   if (dist > N / 2) dist = N - dist;
 
-  // opacity: active=1, jarak 1=0.35, jarak 2=0.18, dst — kontras jelas
-  const baseOpacity = isActive ? 1 : Math.max(0.12, 0.45 - dist * 0.15);
-  const finalOpacity = isHovered && !isActive ? 0.75 : baseOpacity;
+  // opacity dibuat lebih tinggi supaya nama project tetap kebaca walau bukan active.
+  const baseOpacity = isActive ? 1 : Math.max(0.34, 0.68 - dist * 0.11);
+  const finalOpacity = isHovered && !isActive ? 0.9 : baseOpacity;
 
   return (
     <button
@@ -409,20 +413,22 @@ function AnimatedTitle({ text, isActive, isHovered, onHover, onLeave, onClick, i
       onClick={(e) => onClick(index, e)}
       style={{
         background: 'none', border: 'none', padding: '6px 10px', cursor: 'pointer',
-        fontSize: isActive ? 'clamp(32px,4.5vw,60px)' : 'clamp(14px,1.4vw,20px)',
-        fontWeight: isActive ? 300 : 600,
-        letterSpacing: isActive ? '-0.03em' : '0.08em',
+        fontSize: isActive ? 'clamp(34px,4.7vw,64px)' : 'clamp(16px,1.65vw,24px)',
+        fontWeight: isActive ? 500 : 750,
+        letterSpacing: isActive ? '-0.02em' : '0.06em',
         textTransform: isActive ? 'none' : 'uppercase',
         color: isActive ? C.text : `rgba(0,0,0,${finalOpacity})`,
         opacity: finalOpacity,
         transition: 'all 1.4s cubic-bezier(0.16,1,0.3,1)',
         transform: isActive ? 'translateY(-8px)' : isHovered ? 'translateY(-4px) scale(1.08)' : 'translateY(0)',
         whiteSpace: 'nowrap', lineHeight: 1, flexShrink: 0, position: 'relative',
-        textShadow: isHovered && !isActive ? '0 0 20px rgba(0,0,0,0.08)' : 'none',
+        textShadow: isActive
+          ? '0 8px 28px rgba(0,0,0,0.10)'
+          : isHovered ? '0 0 20px rgba(0,0,0,0.14)' : '0 4px 18px rgba(0,0,0,0.08)',
       }}
     >
       {isHovered && !isActive && (
-        <span style={{ position: 'absolute', top: -24, left: '50%', transform: 'translateX(-50%)', fontSize: 18, animation: 'emoji-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1)', pointerEvents: 'none' }}>✨</span>
+        <span style={{ position: 'absolute', top: -24, left: '50%', transform: 'translateX(-50%)', fontSize: 18, animation: 'emoji-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1)', pointerEvents: 'none' }}>.....</span>
       )}
       {text.split('').map((char, i) => (
         <span key={i} style={{
@@ -431,7 +437,7 @@ function AnimatedTitle({ text, isActive, isHovered, onHover, onLeave, onClick, i
           transform: isAnimatingLetters
             ? 'scale(1.3) translateY(-4px)'
             : isHovered && !isActive ? 'scale(1.15) translateY(-2px)' : 'scale(1) translateY(0)',
-          color: isAnimatingLetters ? C.text : isHovered && !isActive ? 'rgba(0,0,0,0.65)' : undefined,
+          color: isAnimatingLetters ? C.text : isHovered && !isActive ? 'rgba(0,0,0,0.82)' : undefined,
         }}>{char}</span>
       ))}
       {isActive && (
@@ -532,7 +538,7 @@ export default function Projects() {
       setActiveIndex(next);
       current = next;
       if (currentStep >= totalSteps) { clearInterval(interval); animationRef.current = null; setIsAnimating(false); }
-    }, 350);
+    }, CAROUSEL_STEP_MS);
     animationRef.current = interval;
   }, [activeIndex]);
 
@@ -541,7 +547,9 @@ export default function Projects() {
   const handlePrev     = useCallback(() => { if (!isAnimating) animateToIndex((activeIndex - 1 + N) % N); }, [activeIndex, isAnimating, animateToIndex]);
   const handleNext     = useCallback(() => { if (!isAnimating) animateToIndex((activeIndex + 1) % N); }, [activeIndex, isAnimating, animateToIndex]);
   const handleDotClick = useCallback((i) => { if (!isAnimating && i !== activeIndex) animateToIndex(i); }, [activeIndex, isAnimating, animateToIndex]);
-  const handleTitleHover = useCallback((i) => { if (!isAnimating) setActiveIndex(i); }, [isAnimating]);
+  const handleActivate = useCallback((i) => {
+    if (!isAnimating && i !== activeIndex) animateToIndex(i);
+  }, [activeIndex, isAnimating, animateToIndex]);
 
   const openModal = useCallback((index, e) => {
     clearTimeout(modalTimers.current.open);
@@ -555,6 +563,15 @@ export default function Projects() {
       setTimeout(() => setModal(p => ({ ...p, contentVisible: true })), 60);
     }, 650);
   }, []);
+
+  const handleProjectClick = useCallback((index, e) => {
+    if (index !== activeIndex) {
+      handleActivate(index);
+      return;
+    }
+
+    openModal(index, e);
+  }, [activeIndex, handleActivate, openModal]);
 
   const closeModal = useCallback(() => {
     clearTimeout(modalTimers.current.open);
@@ -629,11 +646,11 @@ export default function Projects() {
         style={{ position: 'relative', minHeight: '100vh', width: '100%', background: C.bg }}
       >
         <ProjectsHeader />
-        <CurvedCarousel activeIndex={activeIndex} onActivate={setActiveIndex} onClick={openModal} />
+        <CurvedCarousel activeIndex={activeIndex} onActivate={handleActivate} onClick={openModal} />
         <ArrowBtn direction="left"  onClick={handlePrev} />
         <ArrowBtn direction="right" onClick={handleNext} />
         <CarouselDots activeIndex={activeIndex} onDotClick={handleDotClick} />
-        <TitleStrip activeIndex={activeIndex} onHover={handleTitleHover} onLeave={() => {}} onClick={openModal} />
+        <TitleStrip activeIndex={activeIndex} onHover={handleActivate} onLeave={() => {}} onClick={handleProjectClick} />
 
         {/* Modal */}
         {modal.index !== null && (

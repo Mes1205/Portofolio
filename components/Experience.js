@@ -364,7 +364,6 @@ function JobCard({ job, index, isActive }) {
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s',
         }}>
-          <Zap size={12} style={{ color: 'rgba(255,255,255,0.4)' }} />
           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.04em' }}>
             {job.year}
           </span>
@@ -382,7 +381,7 @@ function JobCard({ job, index, isActive }) {
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s',
         }}>{job.place}</p>
         <p style={{
-          fontSize: 'clamp(0.8rem, 1.2vw, 1rem)', lineHeight: 1.75, color: 'rgba(255,255,255,0.55)',
+          fontSize: 'clamp(0.8rem, 1.2vw, 1rem)', lineHeight: 1.75, color: 'rgba(255, 255, 255, 0.86)',
           maxWidth: 480, margin: '0 0 28px 0',
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
@@ -410,7 +409,6 @@ function JobCard({ job, index, isActive }) {
             transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <Star size={12} style={{ color: 'rgba(255,255,255,0.3)' }} />
               <p style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
                 Subjects Taught
               </p>
@@ -419,8 +417,8 @@ function JobCard({ job, index, isActive }) {
               {job.subjects.map((s) => (
                 <span key={s} style={{
                   fontSize: '0.75rem', fontWeight: 600, padding: '5px 14px', borderRadius: 99,
-                  background: 'rgba(250,204,21,0.1)', border: '1px solid rgba(250,204,21,0.18)',
-                  color: 'rgba(250,204,21,0.75)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
+                  background: 'rgba(21, 29, 250, 0.1)', border: '1px solid rgba(119, 134, 255, 0.18)',
+                  color: 'rgba(255, 255, 255, 0.75)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
                 }}
                   onMouseEnter={e => { e.currentTarget.style.background = 'rgba(250,204,21,0.18)'; e.currentTarget.style.color = 'rgba(250,204,21,0.95)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'rgba(250,204,21,0.1)'; e.currentTarget.style.color = 'rgba(250,204,21,0.75)'; e.currentTarget.style.transform = 'translateY(0)'; }}

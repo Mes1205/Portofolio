@@ -76,8 +76,40 @@ export default function Home() {
         <Experience />
 
         {/* Projects + Skills */}
-        <div style={{ position: 'relative', background: '#ffffff', pointerEvents: 'auto' }}>
+        <div
+          style={{
+            position: 'relative',
+            background: '#ffffff',
+            pointerEvents: 'auto',
+            paddingTop: 'clamp(72px, 10vw, 140px)',
+          }}
+        >
           <Projects />
+
+          {/* Transisi Projects → Skills */}
+          <div
+            aria-hidden="true"
+            style={{
+              height: 'clamp(320px, 28vw, 380px)',
+              marginTop: 'clamp(24px, 4vw, 64px)',
+              background: `
+                radial-gradient(
+                  ellipse 180% 110% at 50% 118%,
+                  #0a0a0a    10%,
+                  #0a0a0a    25%,
+                  #0f0f1f   35%,
+                  #1e1b4b   45%,
+                  #1d4ed8   55%,
+                  #3b82f6   65%,
+                  #93c5fd   75%,
+                  #dbeafe   85%,
+                  #f0f9ff   90%,
+                  #ffffff  100%
+                )
+              `,
+            }}
+          />
+
           <Skills />
         </div>
       </div>

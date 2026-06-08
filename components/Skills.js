@@ -69,8 +69,13 @@ const skillsData = [
 function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterProgress }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
+  const [mounted, setMounted] = useState(false); // <-- tambahan
   const cardRef = useRef(null);
   const { Icon } = skill;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), index * 60 + 100);
@@ -85,15 +90,32 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
     onLeave();
   }, [onLeave]);
 
-  // Organic border radius
   const organicRadius = `${20 + (index % 3) * 4}px ${16 + (index % 5) * 3}px ${24 + (index % 2) * 2}px ${18 + (index % 4) * 3}px`;
 
-  // Calculate scatter offset based on scroll progress
-  // scatterProgress: 0 = all centered, 1 = fully spread
   const angle = (index / 20) * Math.PI * 2;
   const scatterRadius = 150 * (1 - scatterProgress);
   const offsetX = Math.cos(angle) * scatterRadius;
   const offsetY = Math.sin(angle) * scatterRadius;
+
+  // Hydration-safe transform
+  let transformStyle;
+  if (!mounted) {
+    transformStyle = 'scale(0.7)';
+  } else {
+    if (isVisible) {
+      if (isPressed) {
+        transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(0.95)`;
+      } else if (isHovered) {
+        transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(1.08) translateY(-6px)`;
+      } else {
+        transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(1)`;
+      }
+    } else {
+      transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(0.7)`;
+    }
+  }
+
+  const opacityStyle = mounted ? (isVisible ? 1 : 0) : 0;
 
   return (
     <div
@@ -125,14 +147,8 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
           : isDark
             ? '1px solid rgba(255,255,255,0.08)'
             : '1px solid rgba(0,0,0,0.08)',
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible
-          ? isPressed
-            ? `translate(${offsetX}px, ${offsetY}px) scale(0.95)`
-            : isHovered
-              ? `translate(${offsetX}px, ${offsetY}px) scale(1.08) translateY(-6px)`
-              : `translate(${offsetX}px, ${offsetY}px) scale(1)`
-          : `translate(${offsetX}px, ${offsetY}px) scale(0.7)`,
+        opacity: opacityStyle,
+        transform: transformStyle,
         transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
         cursor: 'pointer',
         boxShadow: isHovered
@@ -144,7 +160,6 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
         willChange: 'transform, opacity',
       }}
     >
-      {/* Glow ring on hover */}
       {isHovered && (
         <div style={{
           position: 'absolute',
@@ -157,7 +172,6 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
         }} />
       )}
 
-      {/* Logo */}
       <div style={{
         filter: isHovered ? `drop-shadow(0 0 8px ${skill.color}60)` : 'none',
         transition: 'filter 0.3s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
@@ -167,7 +181,6 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
         <Icon size={36} color={skill.color} />
       </div>
       
-      {/* Name */}
       <span style={{
         fontSize: 12,
         fontWeight: 700,
@@ -180,7 +193,6 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
         {skill.name}
       </span>
 
-      {/* Small dot indicator */}
       <div style={{
         width: 4,
         height: 4,

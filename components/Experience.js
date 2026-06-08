@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { ArrowRight, MousePointerClick, Star, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
-import { HERO_HOLD, EXP_SLIDE, EXP_HOLD } from '@/app/page';
 
+// ==================== DATA JOBS ====================
 const jobs = [
   {
     id: 'asprak',
@@ -79,9 +79,8 @@ const jobs = [
 
 const N = jobs.length;
 
-// ─────────────────────────────────────────────────────────────
-// ExperienceHeader
-// ─────────────────────────────────────────────────────────────
+// ==================== KOMPONEN PENDUKUNG ====================
+
 function ExperienceHeader() {
   const [isVisible, setIsVisible] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -95,8 +94,8 @@ function ExperienceHeader() {
   const handleMouseMove = useCallback((e) => {
     if (!headerRef.current) return;
     const rect = headerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width  / 2) / rect.width;
-    const y = (e.clientY - rect.top  - rect.height / 2) / rect.height;
+    const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+    const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
     setMousePos({ x: x * 15, y: y * 10 });
   }, []);
 
@@ -140,15 +139,12 @@ function ExperienceHeader() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// PhotoGallery
-// ─────────────────────────────────────────────────────────────
 function PhotoGallery({ images, isVisible }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef(null);
-  const autoPlayRef  = useRef(null);
+  const autoPlayRef = useRef(null);
 
   useEffect(() => {
     if (!isVisible || images.length <= 1) return;
@@ -161,8 +157,8 @@ function PhotoGallery({ images, isVisible }) {
   const handleMouseMove = useCallback((e) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width  / 2) / rect.width;
-    const y = (e.clientY - rect.top  - rect.height / 2) / rect.height;
+    const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+    const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
     setMousePos({ x: x * 25, y: y * 25 });
   }, []);
 
@@ -262,7 +258,7 @@ function PhotoGallery({ images, isVisible }) {
         return (
           <div key={img.src} style={{
             position: 'absolute',
-            top:  `calc(50% + ${pos.y}px)`,
+            top: `calc(50% + ${pos.y}px)`,
             left: `calc(50% + ${pos.x}px)`,
             transform: `translate(-50%, -50%) translate(${mousePos.x * pos.parallaxMult}px, ${mousePos.y * pos.parallaxMult}px) rotate(${pos.rotate}deg) scale(${isNear ? 0.9 : 0.75})`,
             width: pos.size, height: pos.size * 0.75, zIndex: pos.zIndex,
@@ -297,9 +293,6 @@ function PhotoGallery({ images, isVisible }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// ScrollHint
-// ─────────────────────────────────────────────────────────────
 function ScrollHint({ isVisible }) {
   return (
     <div style={{
@@ -324,69 +317,51 @@ function ScrollHint({ isVisible }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// JobCard
-// ─────────────────────────────────────────────────────────────
 function JobCard({ job, index, isActive }) {
   const [contentVisible, setContentVisible] = useState(false);
 
   useEffect(() => {
+    let timer;
+
     if (isActive) {
-      const timer = setTimeout(() => setContentVisible(true), 150);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setContentVisible(true), 150);
     } else {
-      setContentVisible(false);
+      timer = setTimeout(() => setContentVisible(false), 0);
     }
+
+    return () => clearTimeout(timer);
   }, [isActive]);
 
   return (
     <div style={{
-      flexShrink: 0,
-      width: 'min(90vw, 1100px)',
-      position: 'relative',
+      flexShrink: 0, width: 'min(90vw, 1100px)', position: 'relative',
       padding: 'clamp(60px, 8vw, 100px) 0 clamp(20px, 4vw, 40px)',
-      opacity: isActive ? 1 : 0.4,
-      transform: isActive ? 'translateX(0) scale(1)' : 'translateX(50px) scale(0.97)',
-      transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
-      willChange: 'transform, opacity',
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      minHeight: '75vh',
+      opacity: isActive ? 1 : 0.4, transform: isActive ? 'translateX(0) scale(1)' : 'translateX(50px) scale(0.97)',
+      transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)', willChange: 'transform, opacity',
+      display: 'flex', flexDirection: 'row', alignItems: 'center', minHeight: '75vh',
     }}>
       <div style={{
-        position: 'relative',
-        width: 'clamp(180px, 40vw, 48%)',
-        height: 'clamp(320px, 40vh, 520px)',
-        flexShrink: 0,
-        zIndex: 5,
+        position: 'relative', width: 'clamp(180px, 40vw, 48%)', height: 'clamp(320px, 40vh, 520px)',
+        flexShrink: 0, zIndex: 5,
       }}>
         <PhotoGallery images={job.images} isVisible={isActive} />
       </div>
-
       <div style={{
-        flex: 1,
-        position: 'relative',
-        zIndex: 5,
-        paddingLeft: 'clamp(20px, 4vw, 60px)',
-        minWidth: 0,
+        flex: 1, position: 'relative', zIndex: 5, paddingLeft: 'clamp(20px, 4vw, 60px)', minWidth: 0,
       }}>
         <div style={{
           fontFamily: 'monospace', fontSize: '0.75rem', color: 'rgba(255,255,255,0.18)',
           letterSpacing: '0.1em', marginBottom: 20,
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
+          opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
         }}>
           {String(index + 1).padStart(2, '0')} / {String(N).padStart(2, '0')}
         </div>
-
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20,
           padding: '6px 16px', borderRadius: 99,
           background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
+          opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s',
         }}>
           <Zap size={12} style={{ color: 'rgba(255,255,255,0.4)' }} />
@@ -394,111 +369,62 @@ function JobCard({ job, index, isActive }) {
             {job.year}
           </span>
         </div>
-
         <h3 style={{
-          fontWeight: 800,
-          fontSize: 'clamp(24px, 4vw, 58px)',
-          color: '#ffffff',
+          fontWeight: 800, fontSize: 'clamp(24px, 4vw, 58px)', color: '#ffffff',
           lineHeight: 1.1, margin: '0 0 8px 0', letterSpacing: '-0.03em',
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? 'translateY(0)' : 'translateY(16px)',
+          opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(16px)',
           transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s',
-        }}>
-          {job.title}
-        </h3>
-
+        }}>{job.title}</h3>
         <p style={{
-          fontSize: 'clamp(0.85rem, 1.5vw, 1.1rem)',
-          fontWeight: 500, color: 'rgba(255,255,255,0.4)',
+          fontSize: 'clamp(0.85rem, 1.5vw, 1.1rem)', fontWeight: 500, color: 'rgba(255,255,255,0.4)',
           margin: '0 0 28px 0',
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
+          opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s',
-        }}>
-          {job.place}
-        </p>
-
+        }}>{job.place}</p>
         <p style={{
-          fontSize: 'clamp(0.8rem, 1.2vw, 1rem)',
-          lineHeight: 1.75, color: 'rgba(255,255,255,0.55)',
+          fontSize: 'clamp(0.8rem, 1.2vw, 1rem)', lineHeight: 1.75, color: 'rgba(255,255,255,0.55)',
           maxWidth: 480, margin: '0 0 28px 0',
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
+          opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
-        }}>
-          {job.description}
-        </p>
-
+        }}>{job.description}</p>
         <div style={{
           display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: job.subjects ? 24 : 0,
-          opacity: contentVisible ? 1 : 0,
-          transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
+          opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s',
         }}>
           {job.skills.map((skill) => (
-            <span
-              key={skill}
-              style={{
-                fontSize: '0.78rem', fontWeight: 600, padding: '6px 16px', borderRadius: 99,
-                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.65)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                e.currentTarget.style.color = 'rgba(255,255,255,0.9)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                e.currentTarget.style.color = 'rgba(255,255,255,0.65)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              {skill}
-            </span>
+            <span key={skill} style={{
+              fontSize: '0.78rem', fontWeight: 600, padding: '6px 16px', borderRadius: 99,
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.65)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >{skill}</span>
           ))}
         </div>
-
         {job.subjects && (
           <div style={{
             paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)',
-            opacity: contentVisible ? 1 : 0,
-            transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
+            opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
             transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <Star size={12} style={{ color: 'rgba(255,255,255,0.3)' }} />
-              <p style={{
-                fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase',
-                letterSpacing: '0.14em', color: 'rgba(255,255,255,0.3)', margin: 0,
-              }}>
+              <p style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
                 Subjects Taught
               </p>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {job.subjects.map((s) => (
-                <span
-                  key={s}
-                  style={{
-                    fontSize: '0.75rem', fontWeight: 600, padding: '5px 14px', borderRadius: 99,
-                    background: 'rgba(250,204,21,0.1)', border: '1px solid rgba(250,204,21,0.18)',
-                    color: 'rgba(250,204,21,0.75)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = 'rgba(250,204,21,0.18)';
-                    e.currentTarget.style.color = 'rgba(250,204,21,0.95)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'rgba(250,204,21,0.1)';
-                    e.currentTarget.style.color = 'rgba(250,204,21,0.75)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  {s}
-                </span>
+                <span key={s} style={{
+                  fontSize: '0.75rem', fontWeight: 600, padding: '5px 14px', borderRadius: 99,
+                  background: 'rgba(250,204,21,0.1)', border: '1px solid rgba(250,204,21,0.18)',
+                  color: 'rgba(250,204,21,0.75)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(250,204,21,0.18)'; e.currentTarget.style.color = 'rgba(250,204,21,0.95)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(250,204,21,0.1)'; e.currentTarget.style.color = 'rgba(250,204,21,0.75)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >{s}</span>
               ))}
             </div>
           </div>
@@ -508,269 +434,274 @@ function JobCard({ job, index, isActive }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// ProgressBar
-// ─────────────────────────────────────────────────────────────
 function ProgressBar({ progress }) {
   return (
-    <div style={{
-      position: 'absolute', bottom: 0, left: 0,
-      width: '100%', height: 2, zIndex: 10,
-      background: 'rgba(255,255,255,0.03)',
-    }}>
-      <div style={{
-        height: '100%',
-        width: `${progress * 100}%`,
-        background: 'linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.5))',
-        transition: 'width 0.05s linear',
-      }} />
+    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 2, zIndex: 10, background: 'rgba(255,255,255,0.03)' }}>
+      <div style={{ height: '100%', width: `${progress * 100}%`, background: 'linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.5))', transition: 'width 0.05s linear' }} />
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// MAIN EXPERIENCE COMPONENT (FIXED GRADIENT)
-// ─────────────────────────────────────────────────────────────
-export default function Experience({ mainWrapperRef, isReady }) {
-  const sectionRef   = useRef(null);
+// ==================== MAIN EXPERIENCE ====================
+export default function Experience() {
+  const wrapperRef = useRef(null);
+  const sectionRef = useRef(null);
   const scrollboxRef = useRef(null);
-  const gradientRef  = useRef(null);
-  const [activeIndex,    setActiveIndex]    = useState(0);
+  const gradientRef = useRef(null);
+  const contentRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [showHint,       setShowHint]       = useState(true);
+  const [showHint, setShowHint] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const hintTimer = setTimeout(() => setShowHint(false), 5000);
-    return () => clearTimeout(hintTimer);
+    const timer = setTimeout(() => setShowHint(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
     if (!isReady) return;
 
-    const sectionEl  = sectionRef.current;
-    const scrollbox  = scrollboxRef.current;
-    const gradient   = gradientRef.current;
-    const wrapper    = mainWrapperRef?.current;
-    if (!sectionEl || !scrollbox || !wrapper || !gradient) return;
+    const wrapper = wrapperRef.current;
+    const section = sectionRef.current;
+    const scrollbox = scrollboxRef.current;
+    const gradient = gradientRef.current;
+    const content = contentRef.current;
+    if (!wrapper || !section || !scrollbox || !gradient || !content) return;
 
-    let ctx;
+    let ctx = null;
+    let scrollTrigger = null;
 
     async function init() {
-      const { gsap }          = await import('gsap');
+      const { gsap } = await import('gsap');
       const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      scrollTrigger = ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
-
-      const IDS = ['exp-slide', 'exp-hscroll', 'exp-hide', 'exp-gradient'];
-      ScrollTrigger.getAll()
-        .filter(st => IDS.includes(st.vars.id))
-        .forEach(st => st.kill());
 
       await document.fonts.ready;
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-      await new Promise(r => setTimeout(r, 120));
 
-      const vh = window.innerHeight;
-      scrollbox.getBoundingClientRect();
-      const maxX = Math.max(0, scrollbox.scrollWidth - window.innerWidth);
-
-      const gradientStart = (HERO_HOLD + EXP_SLIDE) * vh;
-      const gradientEnd   = (HERO_HOLD + EXP_SLIDE + EXP_HOLD) * vh + maxX + vh * 0.2;
+      const getMaxX = () => Math.max(0, scrollbox.scrollWidth - window.innerWidth);
+      scrollbox.scrollLeft = 0;
 
       ctx = gsap.context(() => {
 
-        // 1. Slide up Experience from below
-        gsap.fromTo(
-          sectionEl,
-          { y: '100vh' },
+        // 1. ENTRANCE
+        gsap.fromTo(content,
+          { y: 60, opacity: 0.5 },
           {
             y: 0,
+            opacity: 1,
             ease: 'none',
             scrollTrigger: {
-              id:      'exp-slide',
-              trigger: wrapper,
-              start:   `top+=${HERO_HOLD * vh} top`,
-              end:     `top+=${(HERO_HOLD + EXP_SLIDE) * vh} top`,
-              scrub:   0.8,
+              id: 'experience-entrance',
+              trigger: section,
+              start: 'top bottom',
+              end: 'top top',
+              scrub: 0.8,
               invalidateOnRefresh: true,
             },
           }
         );
 
-        // 2. Horizontal scroll
-        const proxy = { value: 0 };
-        gsap.to(proxy, {
-          value: maxX,
-          ease:  'none',
-          onUpdate: () => {
-            scrollbox.scrollLeft = proxy.value;
-            const progress = maxX > 0 ? proxy.value / maxX : 0;
-            setScrollProgress(progress);
-            setActiveIndex(Math.min(N - 1, Math.floor(progress * N)));
-          },
-          scrollTrigger: {
-            id:      'exp-hscroll',
-            trigger: wrapper,
-            start:   `top+=${(HERO_HOLD + EXP_SLIDE + EXP_HOLD) * vh} top`,
-            end:     `top+=${(HERO_HOLD + EXP_SLIDE + EXP_HOLD) * vh + maxX} top`,
-            scrub:   0.8,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        // 3. Gradient overlay moves from bottom (dark) to top (white)
-        gsap.fromTo(
-          gradient,
+        // 2. GRADIENT REVEAL
+        gsap.fromTo(gradient,
           { yPercent: 100 },
           {
             yPercent: 0,
             ease: 'none',
             scrollTrigger: {
-              id:      'exp-gradient',
-              trigger: wrapper,
-              start:   `top+=${gradientStart} top`,
-              end:     `top+=${gradientEnd} top`,
-              scrub:   1.2,
+              id: 'experience-gradient',
+              trigger: section,
+              start: 'top top',
+              end: () => `+=${Math.max(1, getMaxX())}`,
+              scrub: 1.2,
               invalidateOnRefresh: true,
             },
           }
         );
 
-        // 4. Slide Experience out to reveal Projects
-        gsap.to(sectionEl, {
-          y: '-100vh',
+        // 3. HORIZONTAL SCROLL
+        const proxy = { value: 0 };
+        gsap.to(proxy, {
+          value: () => getMaxX(),
           ease: 'none',
+          onUpdate: () => {
+            scrollbox.scrollLeft = proxy.value;
+            const maxX = getMaxX();
+            const progress = maxX > 0 ? proxy.value / maxX : 0;
+            setScrollProgress(progress);
+            setActiveIndex(Math.min(N - 1, Math.floor(progress * N)));
+          },
           scrollTrigger: {
-            id:      'exp-hide',
-            trigger: wrapper,
-            start:   `top+=${(HERO_HOLD + EXP_SLIDE + EXP_HOLD) * vh + maxX} top`,
-            end:     `top+=${(HERO_HOLD + EXP_SLIDE + EXP_HOLD + 1) * vh + maxX} top`,
-            scrub:   1.2,
+            id: 'experience-horizontal',
+            trigger: section,
+            start: 'top top',
+            end: () => `+=${Math.max(1, getMaxX())}`,
+            pin: true,
+            pinSpacing: true,
+            pinType: 'fixed',
+            anticipatePin: 1,
+            scrub: 0.8,
             invalidateOnRefresh: true,
-            onLeave:     () => { sectionEl.style.pointerEvents = 'none'; },
-            onEnterBack: () => { sectionEl.style.pointerEvents = 'auto'; },
           },
         });
 
-      }, sectionEl);
+      }, section);
 
       ScrollTrigger.refresh();
     }
 
     init();
-    return () => { ctx?.revert(); };
-  }, [mainWrapperRef, isReady]);
+
+    const handleResize = () => {
+      scrollTrigger?.refresh();
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      ctx?.revert();
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isReady]);
 
   return (
     <>
       <style>{`
         @keyframes scroll-bounce {
           0%, 100% { transform: translateX(0); }
-          50%       { transform: translateX(6px); }
+          50% { transform: translateX(6px); }
         }
       `}</style>
 
-      <div
-        ref={sectionRef}
-        style={{
-          position: 'fixed',
-          top: 0, left: 0,
-          width: '100vw', height: '100vh',
-          zIndex: 20,
-          overflow: 'hidden',
-          background: '#0a0a0a',
-          willChange: 'transform',
-          transform: 'translateY(100vh)',
-        }}
-      >
-        {/* SEAMLESS GRADIENT OVERLAY */}
+      <div ref={wrapperRef}>
         <div
-          ref={gradientRef}
+          ref={sectionRef}
+          className="hide-scrollbar"
           style={{
-            position: 'absolute',
+            position: 'relative',
             top: 0,
-            left: 0,
             width: '100%',
-            height: '100%',
-            zIndex: 1,
-            pointerEvents: 'none',
+            height: '100vh',
+            overflow: 'hidden',
+            background: '#0a0a0a',
+            pointerEvents: 'auto',
             willChange: 'transform',
-            transform: 'translateY(100%)',
-            background: `
-              linear-gradient(
-                to bottom,
-                #0a0a0a 0%,
-                #111827 15%,
-                #1e3a5f 30%,
-                #2563eb 45%,
-                #3b82f6 55%,
-                #60a5fa 65%,
-                #93c5fd 75%,
-                #bfdbfe 85%,
-                #ffffff 95%,
-                #ffffff 100%
-              )
-            `,
-          }}
-        />
-
-        {/* Grid texture */}
-        <div style={{
-          position: 'absolute', inset: 0, opacity: 0.02, pointerEvents: 'none',
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '100px 100px',
-          zIndex: 2,
-        }} />
-
-        <ExperienceHeader />
-        <ScrollHint isVisible={showHint} />
-
-        <div style={{
-          position: 'absolute', top: '50%', right: 28,
-          transform: 'translateY(-50%)', zIndex: 10,
-          display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center',
-        }}>
-          {jobs.map((_, i) => (
-            <div key={i} style={{
-              width:  i === activeIndex ? 8 : 3,
-              height: i === activeIndex ? 8 : 3,
-              borderRadius: '50%',
-              background: i === activeIndex ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.15)',
-              transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              boxShadow: i === activeIndex ? '0 0 10px rgba(255,255,255,0.3)' : 'none',
-            }} />
-          ))}
-        </div>
-
-        <div
-          ref={scrollboxRef}
-          style={{
-            position: 'absolute', top: 0, left: 0,
-            width: '100%', height: '100%',
-            overflowX: 'hidden', overflowY: 'hidden',
-            zIndex: 3,
           }}
         >
-          <div
-            data-exp-track
-            style={{
-              display: 'flex', alignItems: 'center',
-              height: '100%',
-              gap: 'clamp(6vw, 10vw, 12vw)',
-              paddingLeft: 'clamp(5vw, 10vw, 15vw)',
-              paddingRight: 'clamp(15vw, 25vw, 30vw)',
-              width: 'max-content',
-            }}
-          >
-            {jobs.map((job, i) => (
-              <JobCard key={job.id} job={job} index={i} isActive={i === activeIndex} />
-            ))}
+          <div ref={contentRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+
+            <div
+              ref={gradientRef}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 1,
+                pointerEvents: 'none',
+                willChange: 'transform',
+                background: `
+                  linear-gradient(
+                    to bottom,
+                    #0a0a0a 0%,
+                    #111827 15%,
+                    #1e3a5f 30%,
+                    #2563eb 45%,
+                    #3b82f6 55%,
+                    #60a5fa 65%,
+                    #93c5fd 75%,
+                    #bfdbfe 85%,
+                    #ffffff 95%,
+                    #ffffff 100%
+                  )
+                `,
+              }}
+            />
+
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              opacity: 0.02,
+              pointerEvents: 'none',
+              backgroundImage: `
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '100px 100px',
+              zIndex: 2,
+            }} />
+
+            <ExperienceHeader />
+            <ScrollHint isVisible={showHint} />
+
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              right: 28,
+              transform: 'translateY(-50%)',
+              zIndex: 10,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              alignItems: 'center',
+            }}>
+              {jobs.map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    width: i === activeIndex ? 8 : 3,
+                    height: i === activeIndex ? 8 : 3,
+                    borderRadius: '50%',
+                    background: i === activeIndex ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.15)',
+                    transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: i === activeIndex ? '0 0 10px rgba(255,255,255,0.3)' : 'none',
+                  }}
+                />
+              ))}
+            </div>
+
+            <div
+              ref={scrollboxRef}
+              className="hide-scrollbar"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                overflowX: 'hidden',
+                overflowY: 'hidden',
+                zIndex: 3,
+              }}
+            >
+              <div
+                data-exp-track
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%',
+                  gap: 'clamp(6vw, 10vw, 12vw)',
+                  paddingLeft: 'clamp(5vw, 10vw, 15vw)',
+                  paddingRight: 'clamp(15vw, 25vw, 30vw)',
+                  width: 'max-content',
+                }}
+              >
+                {jobs.map((job, i) => (
+                  <JobCard key={job.id} job={job} index={i} isActive={i === activeIndex} />
+                ))}
+              </div>
+            </div>
+
+            <ProgressBar progress={scrollProgress} />
           </div>
         </div>
-
-        <ProgressBar progress={scrollProgress} />
       </div>
     </>
   );

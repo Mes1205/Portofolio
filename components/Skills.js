@@ -6,11 +6,10 @@ import {
   SiReact, SiNextdotjs, SiTailwindcss, SiTypescript, SiJavascript,
   SiHtml5, SiNodedotjs, SiSupabase, SiPostgresql, SiUnity,
   SiPython, SiScikitlearn, SiGit, SiFigma,
-  SiGooglecolab, SiVercel, SiHuggingface, // SiVisualstudiocode dihapus dari sini
+  SiGooglecolab, SiVercel, SiHuggingface,
   SiStreamlit, SiFirebase, SiThreedotjs,
 } from 'react-icons/si';
-// TbBrandVscode ditambahkan di sini
-import { TbApi, TbDatabase, TbChartBar, TbBrandCSharp, TbBrandVscode } from 'react-icons/tb';
+import { TbApi, TbChartBar, TbBrandCSharp, TbBrandVscode } from 'react-icons/tb';
 
 const skillsData = [
   {
@@ -55,73 +54,59 @@ const skillsData = [
   {
     category: "Tools",
     items: [
-      { name: "Git",            Icon: SiGit,                  color: "#F05032", bg: "rgba(240,80,50,0.12)" },
-      { name: "Figma",          Icon: SiFigma,                color: "#F24E1E", bg: "rgba(242,78,30,0.12)" },
-      { name: "Google Colab",   Icon: SiGooglecolab,          color: "#F9AB00", bg: "rgba(249,171,0,0.12)" },
-      // Icon VS Code diubah menggunakan TbBrandVscode
-      { name: "VS Code",        Icon: TbBrandVscode,          color: "#007ACC", bg: "rgba(0,122,204,0.12)" },
-      { name: "Vercel",         Icon: SiVercel,               color: "#000000", bg: "rgba(0,0,0,0.08)" },
+      { name: "Git",            Icon: SiGit,         color: "#F05032", bg: "rgba(240,80,50,0.12)" },
+      { name: "Figma",          Icon: SiFigma,       color: "#F24E1E", bg: "rgba(242,78,30,0.12)" },
+      { name: "Google Colab",   Icon: SiGooglecolab, color: "#F9AB00", bg: "rgba(249,171,0,0.12)" },
+      { name: "VS Code",        Icon: TbBrandVscode, color: "#007ACC", bg: "rgba(0,122,204,0.12)" },
+      { name: "Vercel",         Icon: SiVercel,      color: "#000000", bg: "rgba(0,0,0,0.08)" },
     ],
   },
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SKILL CARD
+// ─────────────────────────────────────────────────────────────────────────────
 
-function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterProgress }) {
+function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-  const [mounted, setMounted] = useState(false); // <-- tambahan
+  const [mounted, setMounted] = useState(false);
   const cardRef = useRef(null);
   const { Icon } = skill;
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), index * 60 + 100);
     return () => clearTimeout(t);
   }, [index]);
 
-  const handleMouseEnter = useCallback(() => {
-    onHover(skill.name);
-  }, [onHover, skill.name]);
+  const angle = (index / 20) * Math.PI * 2;
+  const cosA = Math.cos(angle);
+  const sinA = Math.sin(angle);
 
-  const handleMouseLeave = useCallback(() => {
-    onLeave();
-  }, [onLeave]);
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.dataset.cosA = String(cosA);
+    card.dataset.sinA = String(sinA);
+  }, [cosA, sinA]);
 
   const organicRadius = `${20 + (index % 3) * 4}px ${16 + (index % 5) * 3}px ${24 + (index % 2) * 2}px ${18 + (index % 4) * 3}px`;
 
-  const angle = (index / 20) * Math.PI * 2;
-  const scatterRadius = 150 * (1 - scatterProgress);
-  const offsetX = Math.cos(angle) * scatterRadius;
-  const offsetY = Math.sin(angle) * scatterRadius;
-
-  // Hydration-safe transform
-  let transformStyle;
-  if (!mounted) {
-    transformStyle = 'scale(0.7)';
-  } else {
-    if (isVisible) {
-      if (isPressed) {
-        transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(0.95)`;
-      } else if (isHovered) {
-        transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(1.08) translateY(-6px)`;
-      } else {
-        transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(1)`;
-      }
-    } else {
-      transformStyle = `translate(${offsetX}px, ${offsetY}px) scale(0.7)`;
-    }
-  }
-
-  const opacityStyle = mounted ? (isVisible ? 1 : 0) : 0;
+  const baseTransform = (() => {
+    if (!mounted) return 'scale(0.7)';
+    if (!isVisible) return 'scale(0.7)';
+    if (isPressed) return 'translate(var(--ox, 0px), var(--oy, 0px)) scale(0.95)';
+    if (isHovered) return 'translate(var(--ox, 0px), var(--oy, 0px)) scale(1.08) translateY(-6px)';
+    return 'translate(var(--ox, 0px), var(--oy, 0px)) scale(1)';
+  })();
 
   return (
     <div
       ref={cardRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={useCallback(() => onHover(skill.name), [onHover, skill.name])}
+      onMouseLeave={useCallback(() => onLeave(), [onLeave])}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
       style={{
@@ -147,17 +132,22 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
           : isDark
             ? '1px solid rgba(255,255,255,0.08)'
             : '1px solid rgba(0,0,0,0.08)',
-        opacity: opacityStyle,
-        transform: transformStyle,
-        transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        opacity: mounted ? (isVisible ? 1 : 0) : 0,
+        transform: baseTransform,
+        transition: [
+          'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          'opacity 0.4s ease',
+          'background 0.3s ease',
+          'border-color 0.3s ease',
+          'box-shadow 0.3s ease',
+        ].join(', '),
         cursor: 'pointer',
         boxShadow: isHovered
           ? `0 12px 40px ${skill.bg}, 0 0 0 1px ${skill.color}40`
           : isDark
             ? '0 2px 8px rgba(0,0,0,0.3)'
             : '0 2px 8px rgba(0,0,0,0.06)',
-        backdropFilter: 'blur(10px)',
-        willChange: 'transform, opacity',
+        willChange: isHovered ? 'transform' : 'auto',
       }}
     >
       {isHovered && (
@@ -180,7 +170,7 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
       }}>
         <Icon size={36} color={skill.color} />
       </div>
-      
+
       <span style={{
         fontSize: 12,
         fontWeight: 700,
@@ -198,14 +188,18 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, scatterP
         height: 4,
         borderRadius: '50%',
         background: isHovered ? skill.color : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-        transition: 'all 0.3s ease',
+        transition: 'background 0.3s ease, transform 0.3s ease',
         transform: isHovered ? 'scale(1.5)' : 'scale(1)',
       }} />
     </div>
   );
 }
 
-function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave, startIndex, scatterProgress }) {
+// ─────────────────────────────────────────────────────────────────────────────
+// SKILL CATEGORY
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave, startIndex }) {
   const [catVisible, setCatVisible] = useState(false);
 
   useEffect(() => {
@@ -215,7 +209,6 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
 
   return (
     <div style={{ marginBottom: 48 }}>
-      {/* Category label */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -223,39 +216,26 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
         marginBottom: 24,
         opacity: catVisible ? 1 : 0,
         transform: catVisible ? 'translateX(0)' : 'translateX(-20px)',
-        transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+        transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
         <div style={{
-          width: 24,
-          height: 2,
-          borderRadius: 1,
+          width: 24, height: 2, borderRadius: 1,
           background: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
         }} />
         <h3 style={{
-          fontSize: 11,
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '0.2em',
+          fontSize: 11, fontWeight: 800, textTransform: 'uppercase',
+          letterSpacing: '0.2em', margin: 0,
           color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
-          margin: 0,
         }}>
           {category}
         </h3>
         <div style={{
-          flex: 1,
-          height: 1,
-          borderRadius: 1,
+          flex: 1, height: 1, borderRadius: 1,
           background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
         }} />
       </div>
 
-      {/* Organic grid of cards */}
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 16,
-        alignItems: 'flex-start',
-      }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-start' }}>
         {items.map((skill, i) => (
           <SkillCard
             key={skill.name}
@@ -265,7 +245,6 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
             onHover={onHover}
             onLeave={onLeave}
             isDark={isDark}
-            scatterProgress={scatterProgress}
           />
         ))}
       </div>
@@ -273,9 +252,9 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FLOATING PARTICLES BACKGROUND
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+// FLOATING PARTICLES
+// ─────────────────────────────────────────────────────────────────────────────
 
 function FloatingParticles({ isDark }) {
   const canvasRef = useRef(null);
@@ -285,6 +264,13 @@ function FloatingParticles({ isDark }) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let animId;
+    let active = true;
+
+    const handleVisibility = () => {
+      active = !document.hidden;
+      if (active) loop();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     const resize = () => {
       canvas.width = canvas.offsetWidth * window.devicePixelRatio;
@@ -294,26 +280,26 @@ function FloatingParticles({ isDark }) {
     resize();
     window.addEventListener('resize', resize);
 
-    const particles = Array.from({ length: 30 }, (_, i) => ({
+    const particles = Array.from({ length: 15 }, () => ({
       x: Math.random() * canvas.offsetWidth,
       y: Math.random() * canvas.offsetHeight,
-      r: 1 + Math.random() * 2,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      opacity: 0.1 + Math.random() * 0.2,
+      r: 1 + Math.random() * 1.5,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      opacity: 0.08 + Math.random() * 0.12,
       pulse: Math.random() * Math.PI * 2,
     }));
 
-    const animate = () => {
+    const loop = () => {
+      if (!active) return;
       const w = canvas.offsetWidth;
       const h = canvas.offsetHeight;
       ctx.clearRect(0, 0, w, h);
 
-      particles.forEach(p => {
+      for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
-        p.pulse += 0.02;
-
+        p.pulse += 0.015;
         if (p.x < 0 || p.x > w) p.vx *= -1;
         if (p.y < 0 || p.y > h) p.vy *= -1;
 
@@ -322,35 +308,36 @@ function FloatingParticles({ isDark }) {
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = isDark ? `rgba(255,255,255,${alpha})` : `rgba(0,0,0,${alpha})`;
         ctx.fill();
-      });
+      }
 
-      // Draw connections
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
+          if (dist < 80) {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.strokeStyle = isDark
-              ? `rgba(255,255,255,${0.03 * (1 - dist / 120)})`
-              : `rgba(0,0,0,${0.03 * (1 - dist / 120)})`;
+              ? `rgba(255,255,255,${0.03 * (1 - dist / 80)})`
+              : `rgba(0,0,0,${0.03 * (1 - dist / 80)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
       }
 
-      animId = requestAnimationFrame(animate);
+      animId = requestAnimationFrame(loop);
     };
 
-    animate();
+    loop();
 
     return () => {
+      active = false;
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [isDark]);
 
@@ -358,53 +345,70 @@ function FloatingParticles({ isDark }) {
     <canvas
       ref={canvasRef}
       style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 0,
+        position: 'absolute', inset: 0,
+        width: '100%', height: '100%',
+        pointerEvents: 'none', zIndex: 0,
       }}
     />
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
 // MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function Skills() {
   const { isDark } = useTheme();
   const [hoveredSkill, setHoveredSkill] = useState(null);
   const [headerVisible, setHeaderVisible] = useState(false);
-  const [scatterProgress, setScatterProgress] = useState(0);
   const sectionRef = useRef(null);
+  const rafRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setHeaderVisible(true), 300);
     return () => clearTimeout(t);
   }, []);
 
-  // Scroll-based scatter animation
   useEffect(() => {
-    const onScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const updateCards = () => {
+      const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
 
-      // Calculate progress: 0 when section enters, 1 when fully visible
       const start = rect.top - vh;
       const end = rect.top + rect.height * 0.5;
       const total = end - start;
       const current = -start;
-      let p = current / total;
-      p = Math.max(0, Math.min(1, p));
-      setScatterProgress(p);
+      const p = Math.max(0, Math.min(1, current / total));
+      const scatterRadius = 150 * (1 - p);
+
+      const cards = section.querySelectorAll('[data-cos-a]');
+      for (const card of cards) {
+        const cosA = parseFloat(card.dataset.cosA ?? '0');
+        const sinA = parseFloat(card.dataset.sinA ?? '0');
+        const ox = cosA * scatterRadius;
+        const oy = sinA * scatterRadius;
+        card.style.setProperty('--ox', `${ox}px`);
+        card.style.setProperty('--oy', `${oy}px`);
+      }
+
+      rafRef.current = null;
+    };
+
+    const onScroll = () => {
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(updateCards);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
+    updateCards();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   let globalIndex = 0;
@@ -439,12 +443,10 @@ export default function Skills() {
           marginBottom: 60,
           opacity: headerVisible ? 1 : 0,
           transform: headerVisible ? 'translateY(0)' : 'translateY(-20px)',
-          transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
         }}>
           <div style={{
-            width: 50,
-            height: 2,
-            borderRadius: 1,
+            width: 50, height: 2, borderRadius: 1,
             background: isDark
               ? 'linear-gradient(to right, transparent, rgba(255,255,255,0.3))'
               : 'linear-gradient(to right, transparent, rgba(0,0,0,0.2))',
@@ -464,7 +466,7 @@ export default function Skills() {
                   display: 'inline-block',
                   opacity: headerVisible ? 1 : 0,
                   transform: headerVisible ? 'translateY(0)' : 'translateY(20px)',
-                  transition: `all 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s`,
+                  transition: `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s`,
                 }}
               >
                 {char}
@@ -472,9 +474,7 @@ export default function Skills() {
             ))}
           </h2>
           <div style={{
-            width: 50,
-            height: 2,
-            borderRadius: 1,
+            width: 50, height: 2, borderRadius: 1,
             background: isDark
               ? 'linear-gradient(to left, transparent, rgba(255,255,255,0.3))'
               : 'linear-gradient(to left, transparent, rgba(0,0,0,0.2))',
@@ -495,12 +495,11 @@ export default function Skills() {
               onHover={setHoveredSkill}
               onLeave={() => setHoveredSkill(null)}
               startIndex={start}
-              scatterProgress={scatterProgress}
             />
           );
         })}
 
-        {/* Bottom decorative line */}
+        {/* Bottom line */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -510,23 +509,17 @@ export default function Skills() {
           transition: 'opacity 1s ease 1s',
         }}>
           <div style={{
-            flex: 1,
-            height: 1,
-            borderRadius: 1,
+            flex: 1, height: 1, borderRadius: 1,
             background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
           }} />
           <span style={{
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: '0.1em',
+            fontSize: 11, fontWeight: 600, letterSpacing: '0.1em',
             color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
           }}>
             Always learning
           </span>
           <div style={{
-            flex: 1,
-            height: 1,
-            borderRadius: 1,
+            flex: 1, height: 1, borderRadius: 1,
             background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
           }} />
         </div>

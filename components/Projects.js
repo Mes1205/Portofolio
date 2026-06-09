@@ -1,118 +1,245 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { X, ExternalLink, ChevronLeft, ChevronRight, Sparkles, ArrowUpRight, MousePointer2, Hand } from 'lucide-react';
+import { X, ExternalLink, ChevronLeft, ChevronRight, ArrowUpRight, MousePointer2, Hand } from 'lucide-react';
 import { useTheme } from '@/app/ThemeProvider';
 
 const projects = [
   {
     title: "Zichara",
-    desc: "Aplikasi Augmented Reality mobile untuk pembelajaran aksara Hanzi dan Pinyin secara interaktif. Menggunakan teknologi ARCore untuk menampilkan karakter 3D dan membantu pengguna memahami penulisan dengan cara yang lebih engaging.",
+    desc: "A mobile Augmented Reality app for learning Hanzi characters and Pinyin interactively. It uses ARCore to display 3D characters in the real world, helping users understand Chinese writing in a more engaging way.",
     tech: ["Unity", "C#", "ARCore", "AR"],
     role: "Full Stack Developer",
     category: "Mobile Development / AR",
     year: "2024",
     whatIDid: [
-      "Merancang arsitektur aplikasi AR dan flow pembelajaran dari scan hingga interaksi karakter.",
-      "Mengembangkan fitur render objek 3D Hanzi/Pinyin berbasis ARCore di Unity.",
-      "Membuat halaman latihan interaktif dan validasi progres belajar pengguna.",
-      "Kolaborasi dengan tim desain untuk optimasi UX agar mudah dipakai pemula.",
+      "Designed the AR app architecture and learning flow from scan to character interaction.",
+      "Developed 3D Hanzi and Pinyin rendering features using ARCore inside Unity.",
+      "Built interactive practice pages with user progress validation.",
+      "Collaborated with the design team to optimize UX for beginner users.",
     ],
     github: "https://github.com/Kelompok-2-IMK/zichara",
     images: ["/images/zichara-0.jpeg", "/images/zichara-1.jpeg", "/images/zichara-2.jpeg", "/images/zichara-3.jpeg", "/images/zichara-4.jpeg", "/images/zichara-5.jpeg"],
   },
   {
     title: "Urunin",
-    desc: "Platform web split bill dengan OCR API untuk scan struk otomatis. Bisa maintain utang piutang antar teman dan tracking pengeluaran pribadi dengan riwayat transaksi terstruktur.",
+    desc: "A web-based split bill platform with OCR for automatic receipt scanning. It tracks debts between friends and keeps a structured transaction history so managing shared expenses is easier.",
     tech: ["React.js", "Tailwind CSS", "Firebase", "JavaScript", "OCR API"],
     role: "Frontend Developer",
     category: "Web Development",
     year: "2024",
     whatIDid: [
-      "Integrasi OCR API untuk scan dan parse struk belanja secara otomatis.",
-      "Membangun sistem tracking utang piutang dengan perhitungan otomatis per anggota.",
-      "Membuat dashboard pengeluaran pribadi dengan riwayat transaksi terstruktur.",
-      "Mengintegrasikan Firebase real-time untuk sinkronisasi data antar pengguna.",
+      "Integrated OCR API to scan and automatically parse shopping receipts.",
+      "Built a debt tracking system with automatic calculations per group member.",
+      "Created a personal expense dashboard with structured transaction history.",
+      "Integrated Firebase real-time sync to keep data updated across users.",
     ],
     github: "https://github.com/Mes1205/Urunin",
     images: ["/images/urunin-1.png", "/images/urunin-2.png", "/images/urunin-3.png", "/images/urunin-4.png"],
   },
   {
     title: "Seluna",
-    desc: "Prototype Figma aplikasi keamanan khusus perempuan. Ketika dalam bahaya, pengguna bisa langsung menelepon kontak darurat, mengirim alert ke semua kontak terpercaya, dan berbagi lokasi real-time secara otomatis.",
+    desc: "A Figma prototype for a women's safety app. In an emergency, users can instantly call a trusted contact, send alerts to all saved contacts, and automatically share their real-time location with one tap.",
     tech: ["Figma", "UI/UX Design", "Prototyping"],
     role: "UI/UX Designer",
     category: "UI/UX Design / Safety App",
     year: "2024",
     whatIDid: [
-      "Merancang user flow darurat yang bisa diakses dengan satu tap dalam situasi bahaya.",
-      "Mendesain sistem alert otomatis ke kontak darurat beserta pengiriman lokasi real-time.",
-      "Membuat prototype interaktif lengkap dari onboarding hingga fitur SOS.",
-      "Riset UX untuk memastikan UI tetap mudah digunakan dalam kondisi panik.",
+      "Designed an emergency user flow accessible with a single tap in dangerous situations.",
+      "Created an automatic alert system to emergency contacts with real-time location sharing.",
+      "Built a complete interactive prototype from onboarding to the SOS feature.",
+      "Conducted UX research to ensure the UI stays usable even in a panic situation.",
     ],
     figma: "https://www.figma.com/proto/JvMTFzw8OcdHNpHPlAEOU9/SAFE-ROUTE?node-id=2448-2547&t=5FiRPWNG9AhMzt3b-1&show-proto-sidebar=1&starting-point-node-id=2448%3A2547",
     images: ["/images/seluna-0.jpeg", "/images/seluna-1.png", "/images/seluna-2.png", "/images/seluna-3.png", "/images/seluna-4.png"],
   },
   {
     title: "Addicx",
-    desc: "Prototype Figma platform untuk membantu orang yang ingin berhenti dari kecanduan. Dilengkapi fitur komunitas untuk sharing antar sesama, progress tracker, dan konsultasi langsung ke profesional.",
+    desc: "A Figma prototype for a platform that helps people quit addiction. It includes a community feature for peer support, a progress tracker to keep users motivated, and direct consultation with health professionals.",
     tech: ["Figma", "UI/UX Design", "Prototyping"],
     role: "UI/UX Designer",
     category: "UI/UX Design / Health App",
     year: "2024",
     whatIDid: [
-      "Mendesain fitur komunitas untuk sharing pengalaman dan saling support antar pengguna.",
-      "Merancang sistem konsultasi dengan profesional kesehatan langsung dari aplikasi.",
-      "Membuat progress tracker visual untuk memotivasi pengguna dalam perjalanan pemulihan.",
-      "Mendesain onboarding personal berdasarkan jenis dan tingkat kecanduan pengguna.",
+      "Designed a community feature for users to share experiences and support each other.",
+      "Built a consultation flow connecting users directly with health professionals in the app.",
+      "Created a visual progress tracker to keep users motivated during recovery.",
+      "Designed personalized onboarding based on the type and level of addiction.",
     ],
     figma: "https://www.figma.com/proto/qgzar1T7KzT0bhf9XK6AZo/Gemastik?node-id=2982-17581&t=lUKgyPthXwiv5z3e-1&starting-point-node-id=2982%3A17745&show-proto-sidebar=1",
     images: ["/images/addicx-0.jpeg", "/images/addicx-1.png", "/images/addicx-2.png", "/images/addicx-3.png", "/images/addicx-4.png"],
   },
   {
+    title: "Fingo",
+    desc: "A financial assistant app built for gig workers in Indonesia. It predicts weekly income for up to 4 weeks ahead based on work history and profile, and includes an AI chat feature powered by Gemini for personalized financial advice.",
+    tech: ["Python", "FastAPI", "TensorFlow", "Gemini API", "Streamlit", "Hugging Face"],
+    role: "AI Engineer",
+    category: "AI / Machine Learning",
+    year: "2025",
+    whatIDid: [
+      "Built an income prediction pipeline using a custom deep learning model with ResidualBlock and HuberMAE loss, deployed via FastAPI on Hugging Face Spaces.",
+      "Designed the prediction API to handle multi-output forecasting for 4-week income projections with trend direction probability.",
+      "Integrated Gemini API for a context-aware financial chat assistant with user financial data as context.",
+      "Iterated through LSTM, Ridge Regression, and deep learning approaches before finalizing the best-performing architecture.",
+    ],
+    github: "https://github.com/Mes1205/Fingo",
+    images: ["images/fingo-1.png", "images/fingo-2.png", "images/fingo-3.png"],
+  },
+  {
+    title: "Papan",
+    desc: "A property listing platform for buying, renting, and finding kos in Indonesia. It comes with a smart decision support system that matches properties to users based on their priorities like budget, location, facilities, and gender preference.",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "NextAuth.js", "Midtrans", "Cloudinary", "Leaflet"],
+    role: "Frontend Developer",
+    category: "Web Development",
+    year: "2025",
+    whatIDid: [
+      "Built frontend pages and components for property listing, search, and user dashboard using Next.js App Router.",
+      "Integrated Leaflet.js for interactive map-based property search.",
+      "Implemented the DSS recommendation UI that displays personalized property matches based on weighted criteria.",
+      "Collaborated in a team with a full CI/CD pipeline using GitHub Actions and Vercel deployment.",
+    ],
+    github: "https://github.com/Mes1205/PAPAN-PPL1",
+    images: ["images/papan-1.png", "images/papan-2.png", "images/papan-3.png", "images/papan-4.png"],
+  },
+  {
     title: "Grammate",
-    desc: "Web app latihan grammar bahasa Inggris berbasis LLM API. Setiap kalimat yang ditulis akan dinilai skornya, diberi feedback detail tentang kesalahan grammar, dan saran perbaikan secara real-time.",
+    desc: "A web app for practicing English grammar using an LLM API. Every sentence written gets a score, detailed feedback on grammar mistakes, and real-time improvement suggestions.",
     tech: ["Python (Streamlit)", "NLP (SBERT)", "LLM (Qwen)", "Scikit-Learn"],
     role: "Full Stack Developer",
     category: "Web Development / AI",
     year: "2024",
     whatIDid: [
-      "Integrasi LLM API untuk analisis grammar dan pemberian skor secara real-time.",
-      "Membangun UI latihan interaktif dengan feedback langsung per kalimat.",
-      "Merancang sistem scoring yang transparan dengan highlight bagian yang salah.",
-      "Membuat riwayat latihan untuk tracking perkembangan grammar pengguna.",
+      "Integrated an LLM API for real-time grammar analysis and scoring.",
+      "Built an interactive practice UI with per-sentence feedback.",
+      "Designed a transparent scoring system that highlights incorrect parts.",
+      "Added a practice history feature to track the user's grammar improvement over time.",
     ],
     github: "https://github.com/Mes1205/Grammate",
     images: ["/images/grammate-1.png", "/images/grammate-2.png"],
   },
   {
+    title: "Kkotkata",
+    desc: "A Korean vocabulary dictionary app built with Semantic Web principles. It uses RDF and Turtle to structure vocabulary data and provides a web interface for searching and browsing words.",
+    tech: ["Python", "RDF", "Turtle", "Semantic Web", "JavaScript", "CSS"],
+    role: "Full Stack Developer",
+    category: "Web Development / Semantic Web",
+    year: "2024",
+    whatIDid: [
+      "Structured Korean vocabulary data in RDF/Turtle format using Semantic Web principles.",
+      "Built a Python script to convert CSV vocabulary datasets into Turtle triples.",
+      "Developed a web-based dictionary interface for searching and displaying vocabulary.",
+      "Designed the data schema to support relational querying between vocabulary entries.",
+    ],
+    github: "https://github.com/Mes1205/Kkotkata",
+    images: ["images/kkotkata-1.png", "images/kkotkata-2.png", "images/kkotkata-3.png"],
+  },
+  {
+    title: "Basic Shooting Game",
+    desc: "A simple 3D shooting game built in Unity. Players can move, aim, and shoot targets in a basic game environment. Built as a hands-on project to learn game development fundamentals.",
+    tech: ["Unity", "C#", "ShaderLab"],
+    role: "Game Developer",
+    category: "Game Development",
+    year: "2025",
+    whatIDid: [
+      "Implemented player movement, shooting mechanics, and basic enemy behavior in Unity.",
+      "Wrote game logic scripts in C# for player controls and game state management.",
+      "Packaged and released the first playable build via GitHub Releases.",
+    ],
+    github: "https://github.com/Mes1205/BasicShootingGame",
+    images: ["/images/basic-shooting-game-1.png", "/images/basic-shooting-game-2.png"],
+  },
+  {
     title: "Tutor AI",
-    desc: "Web chatbot khusus untuk mata kuliah Manajemen Proyek S2 Pertanian. Dilengkapi avatar 3D interaktif dan fitur speech-to-speech sehingga pengguna bisa belajar layaknya diskusi dengan tutor sungguhan.",
+    desc: "A web chatbot built for a graduate-level Project Management course. It has an interactive 3D avatar and speech-to-speech features so users can learn as if they are having a real conversation with a tutor.",
     tech: ["React.js", "Three.js", "Speech API", "LLM API", "Tailwind CSS"],
     role: "Full Stack Developer",
     category: "Web Development / AI",
     year: "2024",
     whatIDid: [
-      "Membangun avatar 3D interaktif yang bergerak sinkron dengan respons audio chatbot.",
-      "Integrasi Speech-to-Text dan Text-to-Speech untuk pengalaman belajar yang natural.",
-      "Menghubungkan LLM API dengan knowledge base materi Manajemen Proyek S2 Pertanian.",
-      "Merancang UI chat yang nyaman untuk sesi belajar panjang dengan konteks percakapan.",
+      "Built an interactive 3D avatar that moves in sync with the chatbot's audio responses.",
+      "Integrated Speech-to-Text and Text-to-Speech for a natural learning experience.",
+      "Connected an LLM API with a knowledge base tailored to the S2 Agriculture Project Management course.",
+      "Designed a comfortable chat UI for long study sessions with conversation context.",
     ],
     github: "https://github.com/pipptutorai/TutorAI-Final",
     images: ["/images/tutorai-1.png", "/images/tutorai-2.png"],
   },
   {
+    title: "Garbage Classification",
+    desc: "A deep learning model for classifying waste images into 6 categories using CNN and EfficientNetV2S with transfer learning. The model is exported in SavedModel, TF-Lite, and TensorFlow.js formats for flexible deployment.",
+    tech: ["Python", "TensorFlow", "EfficientNetV2S", "CNN", "Jupyter Notebook"],
+    role: "ML Engineer",
+    category: "Machine Learning / Computer Vision",
+    year: "2025",
+    whatIDid: [
+      "Built a CNN image classification model using EfficientNetV2S as the backbone with selective fine-tuning.",
+      "Applied data augmentation and class weight balancing to handle dataset imbalance.",
+      "Evaluated the model with confusion matrix and classification report across train, validation, and test sets.",
+      "Exported the model in SavedModel, TF-Lite, and TF.js formats for multi-platform deployment.",
+    ],
+    github: "https://github.com/Mes1205/Garbage-Classification",
+    images: ["images/GarbageClassification-1.png", "images/GarbageClassification-2.png"],
+  },
+  {
+    title: "Sentiment Analysis (ANFIS)",
+    desc: "A sentiment analysis project on Indonesian TikTok comments about women's train carriages. It classifies comments into Negative, Neutral, and Positive using an ANFIS model built on top of TF-IDF features, with a Streamlit app for live prediction.",
+    tech: ["Python", "ANFIS", "TF-IDF", "Streamlit", "Scikit-Learn"],
+    role: "ML Engineer",
+    category: "Machine Learning / NLP",
+    year: "2025",
+    whatIDid: [
+      "Built a full preprocessing and feature extraction pipeline using TF-IDF with Logistic Regression probability features as ANFIS inputs.",
+      "Trained an ANFIS model for 3-class Indonesian sentiment classification.",
+      "Handled class imbalance issues and debugged model artifacts to fix biased predictions.",
+      "Deployed the final model as an interactive Streamlit app for live comment classification.",
+    ],
+    github: "https://github.com/Mes1205/Analisis-Sentimen-Peron-Wanita",
+    images: ["images/analisisSentPeron-1.png", "images/analisisSentPeron-2.png"],
+  },
+  {
+    title: "Data Warehouse Mandiri",
+    desc: "A data warehouse project simulating Bank Mandiri transaction analytics. It uses a Star Schema design with ETL pipelines in Python, Materialized Views in PostgreSQL, and a dashboard for business insights.",
+    tech: ["Python", "PostgreSQL", "ETL", "Star Schema", "Google Data Studio"],
+    role: "Data Engineer",
+    category: "Data Engineering",
+    year: "2025",
+    whatIDid: [
+      "Designed a Star Schema data warehouse for Bank Mandiri transaction data.",
+      "Built ETL pipelines in Python to extract, clean, and load dimension and fact tables.",
+      "Created Materialized Views in PostgreSQL (Aiven) for efficient analytical queries.",
+      "Connected the warehouse to Google Data Studio for an interactive business dashboard.",
+    ],
+    github: "https://github.com/Mes1205/DataWarehouse_Mandiri",
+    images: ["images/Datwer-1.png", "images/Datwer-2.png"],
+  },
+  {
+    title: "Loan Prediction",
+    desc: "A loan approval prediction app using Soft Computing techniques. It combines a Fuzzy Inference System, Genetic Algorithm optimization, and a Neural Network to improve prediction accuracy, with a Streamlit interface for uploading data and viewing results.",
+    tech: ["Python", "Fuzzy Logic", "Genetic Algorithm", "ANN", "Streamlit"],
+    role: "ML Engineer",
+    category: "Machine Learning",
+    year: "2025",
+    whatIDid: [
+      "Implemented a Fuzzy Inference System for rule-based loan eligibility scoring.",
+      "Used a Genetic Algorithm to optimize fuzzy membership function parameters.",
+      "Built and trained an ANN model on top of the fuzzy features for final prediction.",
+      "Developed a Streamlit app with file upload, analysis pipeline, and result visualization.",
+    ],
+    github: "https://github.com/Mes1205/Loan-Prediction",
+    images: ["images/loanPrediction-1.png", "images/loanPrediction-2.png", "images/loanPrediction-3.png", "images/loanPrediction-4.png", "images/loanPrediction-5.png"],
+  },
+  {
     title: "Color Palette Maker",
-    desc: "Web tool untuk generate color palette dari gambar menggunakan algoritma K-Means Clustering. Upload foto, pilih jumlah warna, dan dapatkan palette warna dominan yang siap dipakai untuk desain.",
+    desc: "A web tool for generating color palettes from images using K-Means Clustering. Upload a photo, choose how many colors you want, and get the dominant palette ready to use in your design.",
     tech: ["Python", "K-Means", "React.js", "Machine Learning"],
     role: "Full Stack Developer",
     category: "Web Development / ML",
     year: "2024",
     whatIDid: [
-      "Implementasi algoritma K-Means Clustering untuk ekstraksi warna dominan dari gambar.",
-      "Membangun UI upload gambar dengan preview palette yang dihasilkan secara real-time.",
-      "Menambahkan fitur export palette dalam format HEX, RGB, dan HSL.",
-      "Optimasi performa K-Means untuk hasil yang cepat bahkan pada gambar resolusi tinggi.",
+      "Implemented K-Means Clustering to extract dominant colors from images.",
+      "Built an image upload UI with a real-time palette preview.",
+      "Added export functionality for HEX, RGB, and HSL color formats.",
+      "Optimized K-Means performance for fast results even on high-resolution images.",
     ],
     github: "https://github.com/Mes1205/colorPickerMartha",
     images: ["/images/colorpicker.png"],
@@ -126,7 +253,7 @@ const SCALE_X_STEP = 0.12;
 const SCALE_STEP   = 0.06;
 const OPACITY_STEP = 0.18;
 const VISIBLE_SIDE = 2;
-const CAROUSEL_STEP_MS = 400;
+const CAROUSEL_STEP_MS = 120;
 
 const C = {
   bg:          '#ffffff',
@@ -151,14 +278,13 @@ const C = {
   arrowIconH:  'rgba(0,0,0,0.80)',
 };
 
-// ── Header ───────────────────────────────────────────────────────────────────
 function ProjectsHeader() {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => { const t = setTimeout(() => setIsVisible(true), 300); return () => clearTimeout(t); }, []);
 
   return (
     <div style={{
-      position: 'absolute', top: '5%', left: 0, width: '100%',
+      position: 'absolute', top: '8%', left: 0, width: '100%',
       zIndex: 25, display: 'flex', alignItems: 'center', justifyContent: 'center',
       pointerEvents: 'none',
     }}>
@@ -189,7 +315,6 @@ function ProjectsHeader() {
   );
 }
 
-// ── Carousel ─────────────────────────────────────────────────────────────────
 function CurvedCarousel({ activeIndex, onActivate, onClick }) {
   const stageRef = useRef(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -251,11 +376,7 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
         onMouseEnter={() => { if (!isActive) onActivate(i); setHoveredIndex(i); }}
         onMouseLeave={() => setHoveredIndex(null)}
         onClick={(e) => {
-          if (isActive) {
-            onClick(i, e);
-          } else {
-            onActivate(i);
-          }
+          if (isActive) { onClick(i, e); } else { onActivate(i); }
         }}
         style={{
           position: 'absolute', top: '50%', left: '50%',
@@ -325,13 +446,12 @@ function CurvedCarousel({ activeIndex, onActivate, onClick }) {
   }
 
   return (
-    <div ref={stageRef} style={{ position: 'absolute', top: '52%', left: 0, width: '100%', height: 440, transform: 'translateY(-50%)', zIndex: 20, pointerEvents: 'auto', overflow: 'visible' }}>
+    <div ref={stageRef} style={{ position: 'absolute', top: '64%', left: 0, width: '100%', height: 440, transform: 'translateY(-50%)', zIndex: 20, pointerEvents: 'auto', overflow: 'visible' }}>
       {cards}
     </div>
   );
 }
 
-// ── Dots ─────────────────────────────────────────────────────────────────────
 function CarouselDots({ activeIndex, onDotClick }) {
   return (
     <div style={{
@@ -356,7 +476,6 @@ function CarouselDots({ activeIndex, onDotClick }) {
   );
 }
 
-// ── Arrows ────────────────────────────────────────────────────────────────────
 function ArrowBtn({ direction, onClick }) {
   const isLeft = direction === 'left';
   const [isHov, setIsHov] = useState(false);
@@ -366,7 +485,7 @@ function ArrowBtn({ direction, onClick }) {
       onMouseEnter={() => setIsHov(true)}
       onMouseLeave={() => setIsHov(false)}
       style={{
-        position: 'absolute', top: '52%',
+        position: 'absolute', top: '64%',
         transform: `translateY(-50%) ${isHov ? 'scale(1.12)' : 'scale(1)'}`,
         [isLeft ? 'left' : 'right']: '2.5vw',
         zIndex: 30, width: 48, height: 48, borderRadius: '50%',
@@ -384,8 +503,7 @@ function ArrowBtn({ direction, onClick }) {
   );
 }
 
-// ── Title Strip ───────────────────────────────────────────────────────────────
-function AnimatedTitle({ text, isActive, isHovered, onHover, onLeave, onClick, index, activeIndex }) {
+function AnimatedTitle({ text, isActive, isHovered, onHover, onLeave, onClick, index, activeIndex, measuredWidth }) {
   const [isAnimatingLetters, setIsAnimatingLetters] = useState(false);
   const [hasHoveredOnce, setHasHoveredOnce] = useState(false);
 
@@ -398,86 +516,167 @@ function AnimatedTitle({ text, isActive, isHovered, onHover, onLeave, onClick, i
     }
   };
 
-  // Jarak dari active index — makin jauh makin redup
   let dist = Math.abs(index - activeIndex);
   if (dist > N / 2) dist = N - dist;
 
-  // opacity dibuat lebih tinggi supaya nama project tetap kebaca walau bukan active.
   const baseOpacity = isActive ? 1 : Math.max(0.34, 0.68 - dist * 0.11);
   const finalOpacity = isHovered && !isActive ? 0.9 : baseOpacity;
 
+  const SMALL = 'clamp(9px, 1.05vw, 13px)';
+  const BIG   = 'clamp(18px, 2.0vw, 28px)';
+
   return (
-    <button
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => { onLeave(); setIsAnimatingLetters(false); }}
-      onClick={(e) => onClick(index, e)}
-      style={{
-        background: 'none', border: 'none', padding: '6px 10px', cursor: 'pointer',
-        fontSize: isActive ? 'clamp(34px,4.7vw,64px)' : 'clamp(16px,1.65vw,24px)',
-        fontWeight: isActive ? 500 : 750,
-        letterSpacing: isActive ? '-0.02em' : '0.06em',
-        textTransform: isActive ? 'none' : 'uppercase',
-        color: isActive ? C.text : `rgba(0,0,0,${finalOpacity})`,
-        opacity: finalOpacity,
-        transition: 'all 1.4s cubic-bezier(0.16,1,0.3,1)',
-        transform: isActive ? 'translateY(-8px)' : isHovered ? 'translateY(-4px) scale(1.08)' : 'translateY(0)',
-        whiteSpace: 'nowrap', lineHeight: 1, flexShrink: 0, position: 'relative',
-        textShadow: isActive
-          ? '0 8px 28px rgba(0,0,0,0.10)'
-          : isHovered ? '0 0 20px rgba(0,0,0,0.14)' : '0 4px 18px rgba(0,0,0,0.08)',
-      }}
-    >
-      {isHovered && !isActive && (
-        <span style={{ position: 'absolute', top: -24, left: '50%', transform: 'translateX(-50%)', fontSize: 18, animation: 'emoji-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1)', pointerEvents: 'none' }}>.....</span>
-      )}
-      {text.split('').map((char, i) => (
-        <span key={i} style={{
-          display: 'inline-block',
-          transition: `all 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.05}s`,
-          transform: isAnimatingLetters
-            ? 'scale(1.3) translateY(-4px)'
-            : isHovered && !isActive ? 'scale(1.15) translateY(-2px)' : 'scale(1) translateY(0)',
-          color: isAnimatingLetters ? C.text : isHovered && !isActive ? 'rgba(0,0,0,0.82)' : undefined,
-        }}>{char}</span>
-      ))}
-      {isActive && (
-        <div style={{ position: 'absolute', bottom: -10, left: '50%', transform: 'translateX(-50%)', width: 6, height: 6, borderRadius: '50%', background: C.dotActive, boxShadow: '0 0 8px rgba(0,0,0,0.15)' }} />
-      )}
-      {isHovered && !isActive && (
-        <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', width: 4, height: 4, borderRadius: '50%', background: 'rgba(0,0,0,0.3)', animation: 'pulse-dot 1.5s ease-in-out infinite' }} />
-      )}
-    </button>
+    <div style={{
+      position: 'relative',
+      width: measuredWidth > 0 ? measuredWidth : 'auto',
+      flexShrink: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 28,
+      overflow: 'visible',
+    }}>
+      <button
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={() => { onLeave(); setIsAnimatingLetters(false); }}
+        onClick={(e) => onClick(index, e)}
+        style={{
+          background: isActive ? C.bg : 'none',
+          border: 'none',
+          padding: '4px 6px',
+          cursor: 'pointer',
+          fontSize: isActive ? BIG : SMALL,
+          fontWeight: 700,
+          letterSpacing: isActive ? '-0.01em' : '0.07em',
+          textTransform: 'uppercase',
+          color: isActive ? C.text : `rgba(0,0,0,${finalOpacity})`,
+          opacity: finalOpacity,
+          transition: 'all 1.2s cubic-bezier(0.16,1,0.3,1)',
+          transform: isActive ? 'translateY(-2px)' : isHovered ? 'translateY(-2px)' : 'translateY(0)',
+          whiteSpace: 'nowrap',
+          lineHeight: 1,
+          position: 'relative',
+          zIndex: isActive ? 15 : isHovered ? 5 : 1,
+          textShadow: isActive
+            ? '0 4px 20px rgba(0,0,0,0.10)'
+            : isHovered ? '0 0 16px rgba(0,0,0,0.12)' : 'none',
+        }}
+      >
+        {isHovered && !isActive && (
+          <span style={{
+            position: 'absolute', top: -18, left: '50%',
+            transform: 'translateX(-50%)', fontSize: 12,
+            animation: 'emoji-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1)',
+            pointerEvents: 'none',
+          }}>.....</span>
+        )}
+        {text.split('').map((char, i) => (
+          <span key={i} style={{
+            display: 'inline-block',
+            transition: `all 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.05}s`,
+            transform: isAnimatingLetters
+              ? 'scale(1.3) translateY(-4px)'
+              : isHovered && !isActive ? 'scale(1.15) translateY(-2px)' : 'scale(1) translateY(0)',
+          }}>{char}</span>
+        ))}
+        {isActive && (
+          <div style={{
+            position: 'absolute', bottom: -8, left: '50%',
+            transform: 'translateX(-50%)',
+            width: 6, height: 6, borderRadius: '50%',
+            background: C.dotActive,
+            boxShadow: '0 0 8px rgba(0,0,0,0.15)',
+          }} />
+        )}
+        {isHovered && !isActive && (
+          <div style={{
+            position: 'absolute', bottom: -6, left: '50%',
+            transform: 'translateX(-50%)',
+            width: 4, height: 4, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.3)',
+            animation: 'pulse-dot 1.5s ease-in-out infinite',
+          }} />
+        )}
+      </button>
+    </div>
   );
 }
 
 function TitleStrip({ activeIndex, onHover, onLeave, onClick }) {
   const [hoveredTitle, setHoveredTitle] = useState(null);
+  const ghostRefs = useRef([]);
+  const [measuredWidths, setMeasuredWidths] = useState([]);
+
+  useEffect(() => {
+    const widths = ghostRefs.current.map(el => el ? el.getBoundingClientRect().width + 12 : 0);
+    setMeasuredWidths(widths);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const widths = ghostRefs.current.map(el => el ? el.getBoundingClientRect().width + 12 : 0);
+      setMeasuredWidths(widths);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    // top: 18% — lebih bawah dari sebelumnya (12%) supaya tidak terlalu deket sama header "Projects"
-    <div style={{
-      position: 'absolute', top: '18%', left: 0, width: '100%', zIndex: 30,
-      display: 'flex', alignItems: 'baseline', justifyContent: 'center',
-      gap: '3.5vw', padding: '0 5vw', pointerEvents: 'auto',
-      flexWrap: 'nowrap', overflow: 'hidden',
-    }}>
-      {projects.map((p, i) => (
-        <AnimatedTitle
-          key={i}
-          text={p.title}
-          isActive={i === activeIndex}
-          isHovered={hoveredTitle === i}
-          activeIndex={activeIndex}
-          onHover={(idx) => { setHoveredTitle(idx); onHover(idx); }}
-          onLeave={() => { setHoveredTitle(null); onLeave(); }}
-          onClick={onClick}
-          index={i}
-        />
-      ))}
-    </div>
+    <>
+      <div style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', top: 0, left: 0, display: 'flex', gap: 0 }}>
+        {projects.map((p, i) => (
+          <span
+            key={i}
+            ref={el => { ghostRefs.current[i] = el; }}
+            style={{
+              fontSize: 'clamp(9px, 1.05vw, 13px)',
+              fontWeight: 700,
+              letterSpacing: '0.07em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              padding: '4px 6px',
+            }}
+          >
+            {p.title}
+          </span>
+        ))}
+      </div>
+
+      <div style={{
+        position: 'absolute',
+        top: '18%',
+        left: 0, width: '100%', zIndex: 30,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 'clamp(2px, 0.8vw, 12px)',
+        padding: '0 clamp(60px, 7vw, 110px)',
+        pointerEvents: 'auto',
+        height: '22%',
+        rowGap: 'clamp(6px, 1.2vw, 14px)',
+        alignContent: 'center',
+        overflow: 'visible',
+      }}>
+        {projects.map((p, i) => (
+          <AnimatedTitle
+            key={i}
+            text={p.title}
+            isActive={i === activeIndex}
+            isHovered={hoveredTitle === i}
+            activeIndex={activeIndex}
+            measuredWidth={measuredWidths[i] ?? 0}
+            onHover={(idx) => { setHoveredTitle(idx); onHover(idx); }}
+            onLeave={() => { setHoveredTitle(null); onLeave(); }}
+            onClick={onClick}
+            index={i}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
-// ── Modal helpers ─────────────────────────────────────────────────────────────
 function Label({ children }) {
   return (
     <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: C.textMuted, margin: '0 0 12px' }}>
@@ -507,7 +706,6 @@ function NavBtn({ onClick, label }) {
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
 export default function Projects() {
   const { setProjectModalOpen } = useTheme();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -547,9 +745,7 @@ export default function Projects() {
   const handlePrev     = useCallback(() => { if (!isAnimating) animateToIndex((activeIndex - 1 + N) % N); }, [activeIndex, isAnimating, animateToIndex]);
   const handleNext     = useCallback(() => { if (!isAnimating) animateToIndex((activeIndex + 1) % N); }, [activeIndex, isAnimating, animateToIndex]);
   const handleDotClick = useCallback((i) => { if (!isAnimating && i !== activeIndex) animateToIndex(i); }, [activeIndex, isAnimating, animateToIndex]);
-  const handleActivate = useCallback((i) => {
-    if (!isAnimating && i !== activeIndex) animateToIndex(i);
-  }, [activeIndex, isAnimating, animateToIndex]);
+  const handleActivate = useCallback((i) => { if (!isAnimating && i !== activeIndex) animateToIndex(i); }, [activeIndex, isAnimating, animateToIndex]);
 
   const openModal = useCallback((index, e) => {
     clearTimeout(modalTimers.current.open);
@@ -565,11 +761,7 @@ export default function Projects() {
   }, []);
 
   const handleProjectClick = useCallback((index, e) => {
-    if (index !== activeIndex) {
-      handleActivate(index);
-      return;
-    }
-
+    if (index !== activeIndex) { handleActivate(index); return; }
     openModal(index, e);
   }, [activeIndex, handleActivate, openModal]);
 
@@ -628,7 +820,6 @@ export default function Projects() {
         @keyframes img-in { from { opacity:0; transform:scale(1.08) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
         @keyframes modal-in { from { opacity:0; transform:translateY(30px) scale(0.96); } to { opacity:1; transform:none; } }
         @keyframes modal-out { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(20px) scale(0.98); } }
-        @keyframes sparkle-bounce { 0%,100%{transform:scale(1) rotate(0deg);} 25%{transform:scale(1.3) rotate(-10deg);} 50%{transform:scale(0.9) rotate(5deg);} 75%{transform:scale(1.2) rotate(-5deg);} }
         @keyframes arrow-pop { from{transform:translate(0,0);} to{transform:translate(4px,-4px);} }
         @keyframes float-gentle { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
         @keyframes emoji-bounce { 0%{transform:translateX(-50%) scale(0) rotate(-20deg);opacity:0;} 60%{transform:translateX(-50%) scale(1.3) rotate(10deg);opacity:1;} 100%{transform:translateX(-50%) scale(1) rotate(0deg);opacity:1;} }
@@ -652,7 +843,6 @@ export default function Projects() {
         <CarouselDots activeIndex={activeIndex} onDotClick={handleDotClick} />
         <TitleStrip activeIndex={activeIndex} onHover={handleActivate} onLeave={() => {}} onClick={handleProjectClick} />
 
-        {/* Modal */}
         {modal.index !== null && (
           <div
             className="fixed inset-0 z-50"

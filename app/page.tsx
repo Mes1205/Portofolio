@@ -14,19 +14,40 @@ export const EXP_HOLD = 0.5;
 
 export default function Home() {
   const { isDark } = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
+    let done = false;
+
+    const markReady = () => {
+      if (done) return;
+      done = true;
+      // Kasih 1 frame buat browser nge-layout dulu sebelum GSAP init
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsReady(true));
+      });
+    };
+
+    const check = () => {
+      if (document.readyState === 'complete') {
+        document.fonts.ready.then(markReady);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      document.fonts.ready.then(markReady);
+    } else {
+      window.addEventListener('load', check);
+      return () => window.removeEventListener('load', check);
+    }
   }, []);
 
-  if (isLoading) {
+  if (!isReady) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-[60]">
         <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
-          <div className="absolute inset-0 border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
+          <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
         </div>
         <p className="mt-4 text-white/60 text-sm tracking-wider font-mono animate-pulse">
           LOADING PORTFOLIO...
@@ -37,7 +58,6 @@ export default function Home() {
 
   return (
     <>
-      {/* Global styles */}
       <style>{`
         *, *::before, *::after { box-sizing: border-box; }
         html, body { margin: 0; padding: 0; overflow-x: hidden; }
@@ -45,7 +65,6 @@ export default function Home() {
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      {/* Gradient background layer */}
       <div
         className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-700"
         style={{ opacity: isDark ? 0.42 : 0.62 }}
@@ -56,7 +75,6 @@ export default function Home() {
         isDark ? 'bg-slate-950/38' : 'bg-white/20'
       }`} />
 
-      {/* Fixed Hero layer */}
       <div style={{
         position: 'fixed',
         top: 0, left: 0,
@@ -67,15 +85,11 @@ export default function Home() {
         <Hero />
       </div>
 
-      {/* ==================== SCROLLABLE CONTENT ==================== */}
       <div style={{ position: 'relative', zIndex: 30 }}>
-        {/* Spacer: scroll past Hero */}
         <div style={{ height: `${HERO_HOLD * 100}vh` }} />
 
-        {/* Experience — wrapper & sticky logic di dalam komponen */}
         <Experience />
 
-        {/* Projects + Skills */}
         <div
           style={{
             position: 'relative',
@@ -86,7 +100,6 @@ export default function Home() {
         >
           <Projects />
 
-          {/* Transisi Projects → Skills */}
           <div
             aria-hidden="true"
             style={{

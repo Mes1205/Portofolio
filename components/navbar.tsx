@@ -99,12 +99,43 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
-    setActiveIndex(index);
-    e.preventDefault();
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // components/Navbar.jsx
+const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
+  e.preventDefault();
+  setActiveIndex(index);
+
+  if (href === '#hero') {
+    // Hero fixed di top, tinggal scroll ke 0
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  if (href === '#experience') {
+    // Experience mulai setelah Hero spacer (100vh)
+    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    return;
+  }
+
+  if (href === '#projects') {
+    const el = document.getElementById('projects');
+    if (!el) return;
+    // Projects ada di dalam scrollable div setelah Experience
+    // Cari posisi absolutnya di document
+    const rect = el.getBoundingClientRect();
+    const scrollTop = window.scrollY + rect.top;
+    window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+    return;
+  }
+
+  if (href === '#skills') {
+    const el = document.getElementById('skills');
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const scrollTop = window.scrollY + rect.top;
+    window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+    return;
+  }
+};
 
   return (
     <>

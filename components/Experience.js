@@ -580,6 +580,7 @@ export default function Experience() {
       <div ref={wrapperRef}>
         <div
           ref={sectionRef}
+          id="experience" 
           className="hide-scrollbar"
           style={{
             position: 'relative',
@@ -667,6 +668,7 @@ export default function Experience() {
 
             <div
               ref={scrollboxRef}
+              id="experience" 
               className="hide-scrollbar"
               style={{
                 position: 'absolute',

@@ -278,6 +278,20 @@ const C = {
   arrowIconH:  'rgba(0,0,0,0.80)',
 };
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 function ProjectsHeader() {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => { const t = setTimeout(() => setIsVisible(true), 300); return () => clearTimeout(t); }, []);
@@ -706,8 +720,117 @@ function NavBtn({ onClick, label }) {
   );
 }
 
+function MobileProjectList({ onOpen }) {
+  return (
+    <div style={{
+      position: 'relative',
+      zIndex: 5,
+      maxWidth: 760,
+      margin: '0 auto',
+      padding: '86px 12px 56px',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 22 }}>
+        <div style={{ flex: 1, maxWidth: 42, height: 2, background: 'linear-gradient(to right, transparent, rgba(0,0,0,0.18))' }} />
+        <h2 style={{ margin: 0, fontSize: 'clamp(32px, 10vw, 46px)', fontWeight: 800, color: C.text }}>
+          Projects
+        </h2>
+        <div style={{ flex: 1, maxWidth: 42, height: 2, background: 'linear-gradient(to left, transparent, rgba(0,0,0,0.18))' }} />
+      </div>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        gap: 12,
+        alignItems: 'stretch',
+      }}>
+        {projects.map((project, index) => (
+          <article
+            key={project.title}
+            style={{
+              border: `1px solid ${C.border}`,
+              borderRadius: 16,
+              overflow: 'hidden',
+              background: C.bgCard,
+              boxShadow: '0 10px 26px rgba(0,0,0,0.08)',
+              minWidth: 0,
+            }}
+          >
+            <button
+              onClick={(e) => onOpen(index, e)}
+              style={{
+                width: '100%',
+                display: 'block',
+                padding: 0,
+                border: 'none',
+                background: C.bgSurface,
+                cursor: 'pointer',
+                textAlign: 'left',
+                height: '100%',
+              }}
+            >
+              <div style={{ aspectRatio: '1 / 0.78', background: C.bgSurface }}>
+                <img
+                  src={project.images[0]}
+                  alt={project.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              </div>
+              <div style={{ padding: '12px 11px 13px' }}>
+                <p style={{
+                  margin: '0 0 7px',
+                  fontSize: 9,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: C.textMuted,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {project.category}
+                </p>
+                <h3 style={{
+                  margin: 0,
+                  minHeight: 38,
+                  fontSize: 'clamp(15px, 4.4vw, 19px)',
+                  lineHeight: 1.12,
+                  fontWeight: 800,
+                  color: C.text,
+                  letterSpacing: 0,
+                  overflowWrap: 'anywhere',
+                }}>
+                  {project.title}
+                </h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 11 }}>
+                  {project.tech.slice(0, 2).map((tech) => (
+                    <span key={tech} style={{
+                      maxWidth: '100%',
+                      fontSize: 9,
+                      fontWeight: 800,
+                      padding: '5px 7px',
+                      borderRadius: 999,
+                      background: C.pill,
+                      color: C.pillText,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </button>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Projects() {
   const { setProjectModalOpen } = useTheme();
+  const isMobile = useIsMobile();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationRef = useRef(null);
@@ -791,8 +914,8 @@ export default function Projects() {
     const project = projects[modal.index];
     const onKey = (e) => {
       if (e.key === 'Escape') closeModal();
-      if (e.key === 'ArrowLeft') setModal(p => ({ ...p, slideIndex: Math.max(0, p.slideIndex - 1) }));
-      if (e.key === 'ArrowRight') setModal(p => ({ ...p, slideIndex: Math.min(project.images.length - 1, p.slideIndex + 1) }));
+      if (e.key === 'ArrowLeft') setModal(p => ({ ...p, slideIndex: (p.slideIndex - 1 + project.images.length) % project.images.length }));
+      if (e.key === 'ArrowRight') setModal(p => ({ ...p, slideIndex: (p.slideIndex + 1) % project.images.length }));
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -834,14 +957,20 @@ export default function Projects() {
 
       <section
         id="projects"
-        style={{ position: 'relative', minHeight: '100vh', width: '100%', background: C.bg }}
+        style={{ position: 'relative', minHeight: isMobile ? 'auto' : '100vh', width: '100%', background: C.bg }}
       >
-        <ProjectsHeader />
-        <CurvedCarousel activeIndex={activeIndex} onActivate={handleActivate} onClick={openModal} />
-        <ArrowBtn direction="left"  onClick={handlePrev} />
-        <ArrowBtn direction="right" onClick={handleNext} />
-        <CarouselDots activeIndex={activeIndex} onDotClick={handleDotClick} />
-        <TitleStrip activeIndex={activeIndex} onHover={handleActivate} onLeave={() => {}} onClick={handleProjectClick} />
+        {isMobile ? (
+          <MobileProjectList onOpen={openModal} />
+        ) : (
+          <>
+            <ProjectsHeader />
+            <CurvedCarousel activeIndex={activeIndex} onActivate={handleActivate} onClick={openModal} />
+            <ArrowBtn direction="left"  onClick={handlePrev} />
+            <ArrowBtn direction="right" onClick={handleNext} />
+            <CarouselDots activeIndex={activeIndex} onDotClick={handleDotClick} />
+            <TitleStrip activeIndex={activeIndex} onHover={handleActivate} onLeave={() => {}} onClick={handleProjectClick} />
+          </>
+        )}
 
         {modal.index !== null && (
           <div
@@ -853,15 +982,21 @@ export default function Projects() {
               willChange: 'clip-path',
             }}
           >
-            <div className="absolute inset-0 flex items-center justify-center" onClick={closeModal}>
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ padding: isMobile ? 10 : 0 }}
+              onClick={closeModal}
+            >
               {activeProject && (
                 <div
                   className={modal.phase === 'closing' ? 'm-out' : 'm-in'}
                   style={{
-                    width: '92vw', maxWidth: 1100, height: '90vh',
+                    width: isMobile ? '100%' : '92vw',
+                    maxWidth: 1100,
+                    height: isMobile ? '94svh' : '90vh',
                     background: C.bg,
                     border: `1px solid ${C.borderMed}`,
-                    borderRadius: '28px 36px 32px 40px / 36px 28px 40px 32px',
+                    borderRadius: isMobile ? 18 : '28px 36px 32px 40px / 36px 28px 40px 32px',
                     overflow: 'hidden', position: 'relative',
                     boxShadow: '0 32px 100px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,0,0,0.05)',
                   }}
@@ -870,7 +1005,7 @@ export default function Projects() {
                   <button
                     onClick={closeModal}
                     style={{
-                      position: 'absolute', top: 20, right: 20, zIndex: 10,
+                      position: 'absolute', top: isMobile ? 12 : 20, right: isMobile ? 12 : 20, zIndex: 10,
                       width: 40, height: 40, borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       background: 'rgba(0,0,0,0.06)', border: `1px solid ${C.border}`,
@@ -884,30 +1019,33 @@ export default function Projects() {
                     <X size={16} />
                   </button>
 
-                  <div style={{ display: 'flex', height: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: '100%', overflowY: isMobile ? 'auto' : 'hidden' }}>
                     <div style={{
-                      width: '45%', flexShrink: 0, display: 'flex', flexDirection: 'column',
+                      width: isMobile ? '100%' : '45%',
+                      height: isMobile ? '34svh' : 'auto',
+                      minHeight: isMobile ? 220 : undefined,
+                      flexShrink: 0, display: 'flex', flexDirection: 'column',
                       background: C.bgSurface,
                       opacity: modal.contentVisible ? 1 : 0,
                       transition: 'opacity 0.6s cubic-bezier(0.16,1,0.3,1)',
                     }}>
-                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, overflow: 'hidden' }}>
+                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: isMobile ? 14 : 24, overflow: 'hidden' }}>
                         {activeImages.length > 0 ? (
                           <img
                             key={modal.slideIndex}
                             src={activeImages[modal.slideIndex]}
                             alt={`${activeProject.title} ${modal.slideIndex + 1}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 18, animation: 'img-in 0.6s cubic-bezier(0.22,1,0.36,1) forwards' }}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: isMobile ? 12 : 18, animation: 'img-in 0.6s cubic-bezier(0.22,1,0.36,1) forwards' }}
                           />
                         ) : (
                           <p style={{ color: C.textMuted, fontSize: 13 }}>Belum ada gambar</p>
                         )}
                       </div>
                       {activeImages.length > 1 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 24px 24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: isMobile ? '0 14px 14px' : '0 24px 24px', overflowX: 'auto' }}>
                           {activeImages.map((img, idx) => (
                             <button key={idx} onClick={() => setModal(p => ({ ...p, slideIndex: idx }))} style={{
-                              width: 56, height: 40, borderRadius: 12, overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
+                              width: isMobile ? 46 : 56, height: isMobile ? 34 : 40, borderRadius: 12, overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
                               border: `2px solid ${idx === modal.slideIndex ? C.dotActive : 'transparent'}`,
                               opacity: idx === modal.slideIndex ? 1 : 0.35,
                               transform: idx === modal.slideIndex ? 'scale(1.08) translateY(-4px)' : 'scale(1)',
@@ -934,16 +1072,17 @@ export default function Projects() {
                     </div>
 
                     <div style={{
-                      flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden',
-                      borderLeft: `1px solid ${C.border}`,
+                      flex: 1, display: 'flex', flexDirection: 'column', overflow: isMobile ? 'visible' : 'hidden',
+                      borderLeft: isMobile ? 'none' : `1px solid ${C.border}`,
+                      borderTop: isMobile ? `1px solid ${C.border}` : 'none',
                       opacity: modal.contentVisible ? 1 : 0,
                       transition: 'opacity 0.6s 100ms cubic-bezier(0.16,1,0.3,1)',
                     }}>
-                      <div style={{ padding: '28px 36px', borderBottom: `1px solid ${C.border}` }}>
+                      <div style={{ padding: isMobile ? '22px 18px 18px' : '28px 36px', borderBottom: `1px solid ${C.border}` }}>
                         <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: C.textMuted, margin: '0 0 8px' }}>
                           {activeProject.category}
                         </p>
-                        <h3 style={{ fontSize: 40, fontWeight: 800, color: C.text, letterSpacing: '-0.02em', margin: 0 }}>
+                        <h3 style={{ fontSize: isMobile ? 'clamp(28px, 9vw, 38px)' : 40, fontWeight: 800, color: C.text, letterSpacing: 0, margin: 0, lineHeight: 1.08 }}>
                           {activeProject.title}
                         </h3>
                         <p style={{ fontSize: 14, color: C.textSub, margin: '8px 0 0', fontWeight: 500 }}>
@@ -951,7 +1090,7 @@ export default function Projects() {
                         </p>
                       </div>
 
-                      <div className="modal-scroll" style={{ flex: 1, overflowY: 'auto', padding: '28px 36px', display: 'flex', flexDirection: 'column', gap: 32 }}>
+                      <div className="modal-scroll" style={{ flex: 1, overflowY: isMobile ? 'visible' : 'auto', padding: isMobile ? '22px 18px' : '28px 36px', display: 'flex', flexDirection: 'column', gap: isMobile ? 24 : 32 }}>
                         <div>
                           <Label>Tentang</Label>
                           <p style={{ fontSize: 15, lineHeight: 1.7, color: C.textSub, margin: 0 }}>{activeProject.desc}</p>
@@ -984,20 +1123,21 @@ export default function Projects() {
                         </div>
                       </div>
 
-                      <div style={{ padding: '22px 36px', borderTop: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div style={{ padding: isMobile ? '16px 18px 18px' : '22px 36px', borderTop: `1px solid ${C.border}`, display: 'flex', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: 14 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, justifyContent: isMobile ? 'space-between' : 'flex-start' }}>
                           <span style={{ fontSize: 13, color: C.textMuted, fontWeight: 600 }}>
                             {(modal.index ?? 0) + 1} / {projects.length}
                           </span>
                           <div style={{ display: 'flex', gap: 8 }}>
-                            <NavBtn label="← Prev" onClick={() => setModal(p => ({ ...p, index: ((p.index ?? 0) - 1 + projects.length) % projects.length, slideIndex: 0 }))} />
-                            <NavBtn label="Next →" onClick={() => setModal(p => ({ ...p, index: ((p.index ?? 0) + 1) % projects.length, slideIndex: 0 }))} />
+                            <NavBtn label="Prev" onClick={() => setModal(p => ({ ...p, index: ((p.index ?? 0) - 1 + projects.length) % projects.length, slideIndex: 0 }))} />
+                            <NavBtn label="Next" onClick={() => setModal(p => ({ ...p, index: ((p.index ?? 0) + 1) % projects.length, slideIndex: 0 }))} />
                           </div>
                         </div>
                         <a href={activeProject?.figma || activeProject?.github}
                           target="_blank" rel="noreferrer"
                           style={{
                             display: 'inline-flex', alignItems: 'center', gap: 10,
+                            justifyContent: 'center',
                             fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em',
                             padding: '10px 20px', borderRadius: 14,
                             background: C.text, color: '#ffffff',

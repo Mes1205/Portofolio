@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { ArrowRight, MousePointerClick, Star, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // ==================== DATA JOBS ====================
 const jobs = [
@@ -79,6 +79,20 @@ const jobs = [
 
 const N = jobs.length;
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 // ==================== KOMPONEN PENDUKUNG ====================
 
 function ExperienceHeader() {
@@ -139,7 +153,7 @@ function ExperienceHeader() {
   );
 }
 
-function PhotoGallery({ images, isVisible }) {
+function PhotoGallery({ images, isVisible, compact = false }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -174,19 +188,31 @@ function PhotoGallery({ images, isVisible }) {
   return (
     <div
       ref={containerRef}
-      onMouseMove={handleMouseMove}
+      onMouseMove={compact ? undefined : handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => { setIsHovered(false); setMousePos({ x: 0, y: 0 }); }}
-      style={{ position: 'relative', width: '100%', height: '100%', minHeight: 480, overflow: 'visible' }}
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        minHeight: compact ? 188 : 480,
+        overflow: compact ? 'hidden' : 'visible',
+      }}
     >
       <div style={{
         position: 'absolute', top: '50%', left: '50%',
-        transform: `translate(-50%, -50%) translate(${mousePos.x}px, ${mousePos.y}px) rotate(-2deg)`,
-        width: 340, height: 255, zIndex: 10,
+        transform: compact
+          ? 'translate(-50%, -50%)'
+          : `translate(-50%, -50%) translate(${mousePos.x}px, ${mousePos.y}px) rotate(-2deg)`,
+        width: compact ? '100%' : 340,
+        height: compact ? '100%' : 255,
+        zIndex: 10,
         opacity: isVisible ? 1 : 0,
         transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease-out',
         borderRadius: 16, overflow: 'hidden',
-        boxShadow: isHovered
+        boxShadow: compact
+          ? '0 14px 28px rgba(0,0,0,0.34), 0 0 0 1px rgba(255,255,255,0.10)'
+          : isHovered
           ? '0 32px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.15)'
           : '0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
         cursor: 'pointer', background: '#111',
@@ -227,7 +253,7 @@ function PhotoGallery({ images, isVisible }) {
                 width: 32, height: 32, borderRadius: '50%',
                 background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
                 color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', opacity: isHovered ? 1 : 0, transition: 'all 0.3s ease', backdropFilter: 'blur(8px)',
+                cursor: 'pointer', opacity: compact || isHovered ? 1 : 0, transition: 'all 0.3s ease', backdropFilter: 'blur(8px)',
               }}
             >
               <ChevronLeft size={16} />
@@ -239,7 +265,7 @@ function PhotoGallery({ images, isVisible }) {
                 width: 32, height: 32, borderRadius: '50%',
                 background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
                 color: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', opacity: isHovered ? 1 : 0, transition: 'all 0.3s ease', backdropFilter: 'blur(8px)',
+                cursor: 'pointer', opacity: compact || isHovered ? 1 : 0, transition: 'all 0.3s ease', backdropFilter: 'blur(8px)',
               }}
             >
               <ChevronRight size={16} />
@@ -248,7 +274,7 @@ function PhotoGallery({ images, isVisible }) {
         )}
       </div>
 
-      {images.map((img, i) => {
+      {!compact && images.map((img, i) => {
         if (i === currentIndex) return null;
         const pos = positions[i % positions.length];
         const isNear =
@@ -317,7 +343,7 @@ function ScrollHint({ isVisible }) {
   );
 }
 
-function JobCard({ job, index, isActive }) {
+function JobCard({ job, index, isActive, mobile = false }) {
   const [contentVisible, setContentVisible] = useState(false);
 
   useEffect(() => {
@@ -334,68 +360,107 @@ function JobCard({ job, index, isActive }) {
 
   return (
     <div style={{
-      flexShrink: 0, width: 'min(90vw, 1100px)', position: 'relative',
-      padding: 'clamp(60px, 8vw, 100px) 0 clamp(20px, 4vw, 40px)',
-      opacity: isActive ? 1 : 0.4, transform: isActive ? 'translateX(0) scale(1)' : 'translateX(50px) scale(0.97)',
+      flexShrink: 0,
+      width: mobile ? '100%' : 'min(90vw, 1100px)',
+      position: 'relative',
+      padding: mobile ? '0' : 'clamp(60px, 8vw, 100px) 0 clamp(20px, 4vw, 40px)',
+      opacity: isActive ? 1 : mobile ? 1 : 0.4,
+      transform: isActive ? 'translateX(0) scale(1)' : mobile ? 'none' : 'translateX(50px) scale(0.97)',
       transition: 'all 1.2s cubic-bezier(0.16, 1, 0.3, 1)', willChange: 'transform, opacity',
-      display: 'flex', flexDirection: 'row', alignItems: 'center', minHeight: '75vh',
+      display: 'flex',
+      flexDirection: mobile ? 'column' : 'row',
+      alignItems: mobile ? 'stretch' : 'center',
+      minHeight: mobile ? 'auto' : '75vh',
+      gap: mobile ? 15 : 0,
+      borderRadius: mobile ? 18 : 0,
+      paddingBlock: mobile ? 14 : undefined,
+      border: mobile ? '1px solid rgba(147,197,253,0.18)' : undefined,
+      background: mobile
+        ? 'linear-gradient(145deg, rgba(5,10,24,0.86), rgba(15,23,42,0.74))'
+        : undefined,
+      backdropFilter: mobile ? 'blur(14px)' : undefined,
+      boxShadow: mobile ? '0 16px 34px rgba(2,6,23,0.30), inset 0 1px 0 rgba(255,255,255,0.06)' : undefined,
     }}>
       <div style={{
-        position: 'relative', width: 'clamp(180px, 40vw, 48%)', height: 'clamp(320px, 40vh, 520px)',
+        position: 'relative',
+        width: mobile ? '100%' : 'clamp(180px, 40vw, 48%)',
+        height: mobile ? 188 : 'clamp(320px, 40vh, 520px)',
         flexShrink: 0, zIndex: 5,
+        padding: mobile ? '0 12px' : 0,
       }}>
-        <PhotoGallery images={job.images} isVisible={isActive} />
+        <PhotoGallery images={job.images} isVisible={isActive} compact={mobile} />
       </div>
       <div style={{
-        flex: 1, position: 'relative', zIndex: 5, paddingLeft: 'clamp(20px, 4vw, 60px)', minWidth: 0,
+        flex: 1,
+        position: 'relative',
+        zIndex: 5,
+        paddingLeft: mobile ? 14 : 'clamp(20px, 4vw, 60px)',
+        paddingRight: mobile ? 14 : 0,
+        paddingBottom: mobile ? 4 : 0,
+        minWidth: 0,
       }}>
         <div style={{
-          fontFamily: 'monospace', fontSize: '0.75rem', color: 'rgba(255,255,255,0.18)',
-          letterSpacing: '0.1em', marginBottom: 20,
+          fontFamily: 'monospace', fontSize: mobile ? '0.68rem' : '0.75rem', color: mobile ? 'rgba(191,219,254,0.42)' : 'rgba(255,255,255,0.18)',
+          letterSpacing: '0.1em', marginBottom: mobile ? 10 : 20,
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
         }}>
           {String(index + 1).padStart(2, '0')} / {String(N).padStart(2, '0')}
         </div>
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20,
-          padding: '6px 16px', borderRadius: 99,
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+          display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: mobile ? 12 : 20,
+          padding: mobile ? '5px 12px' : '6px 16px', borderRadius: 99,
+          background: mobile ? 'rgba(96,165,250,0.13)' : 'rgba(255,255,255,0.05)',
+          border: mobile ? '1px solid rgba(147,197,253,0.18)' : '1px solid rgba(255,255,255,0.08)',
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s',
         }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: mobile ? '0.72rem' : '0.8rem', fontWeight: 700, color: mobile ? 'rgba(219,234,254,0.78)' : 'rgba(255,255,255,0.55)', letterSpacing: '0.04em' }}>
             {job.year}
           </span>
         </div>
         <h3 style={{
-          fontWeight: 800, fontSize: 'clamp(24px, 4vw, 58px)', color: '#ffffff',
-          lineHeight: 1.1, margin: '0 0 8px 0', letterSpacing: '-0.03em',
+          fontWeight: 800,
+          fontSize: mobile ? 'clamp(20px, 6.5vw, 28px)' : 'clamp(24px, 4vw, 58px)',
+          color: '#ffffff',
+          lineHeight: 1.12,
+          margin: '0 0 7px 0',
+          letterSpacing: 0,
+          textShadow: mobile ? '0 2px 16px rgba(2,6,23,0.82)' : 'none',
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(16px)',
           transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s',
         }}>{job.title}</h3>
         <p style={{
-          fontSize: 'clamp(0.85rem, 1.5vw, 1.1rem)', fontWeight: 500, color: 'rgba(255,255,255,0.4)',
-          margin: '0 0 28px 0',
+          fontSize: mobile ? '0.78rem' : 'clamp(0.85rem, 1.5vw, 1.1rem)', fontWeight: 600, color: mobile ? 'rgba(191,219,254,0.70)' : 'rgba(255,255,255,0.4)',
+          margin: mobile ? '0 0 14px 0' : '0 0 22px 0',
+          maxWidth: mobile ? '100%' : undefined,
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s',
         }}>{job.place}</p>
         <p style={{
-          fontSize: 'clamp(0.8rem, 1.2vw, 1rem)', lineHeight: 1.75, color: 'rgba(255, 255, 255, 0.86)',
-          maxWidth: 480, margin: '0 0 28px 0',
+          fontSize: mobile ? '0.78rem' : 'clamp(0.8rem, 1.2vw, 1rem)',
+          lineHeight: mobile ? 1.62 : 1.75,
+          color: mobile ? 'rgba(248,250,252,0.88)' : 'rgba(255, 255, 255, 0.86)',
+          maxWidth: mobile ? '100%' : 480,
+          margin: mobile ? '0 0 16px 0' : '0 0 28px 0',
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s',
         }}>{job.description}</p>
         <div style={{
-          display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: job.subjects ? 24 : 0,
+          display: 'flex', flexWrap: 'wrap', gap: mobile ? 6 : 8, marginBottom: job.subjects ? (mobile ? 14 : 24) : 0,
           opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
           transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s',
         }}>
           {job.skills.map((skill) => (
             <span key={skill} style={{
-              fontSize: '0.78rem', fontWeight: 600, padding: '6px 16px', borderRadius: 99,
-              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.65)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
+              fontSize: mobile ? '0.68rem' : '0.78rem',
+              fontWeight: 700,
+              padding: mobile ? '5px 10px' : '6px 16px',
+              borderRadius: 99,
+              background: mobile ? 'rgba(255,255,255,0.075)' : 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: mobile ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.65)',
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
             }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -404,7 +469,7 @@ function JobCard({ job, index, isActive }) {
         </div>
         {job.subjects && (
           <div style={{
-            paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)',
+            paddingTop: mobile ? 14 : 20, borderTop: '1px solid rgba(255,255,255,0.08)',
             opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0)' : 'translateY(10px)',
             transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
           }}>
@@ -440,6 +505,97 @@ function ProgressBar({ progress }) {
   );
 }
 
+function MobileExperience() {
+  return (
+    <section
+      id="experience"
+      style={{
+        position: 'relative',
+        width: '100%',
+        overflow: 'hidden',
+        background: '#0a0a0a',
+        padding: '78px 12px 68px',
+        pointerEvents: 'auto',
+      }}
+    >
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        background: `
+          linear-gradient(
+            to bottom,
+            #0a0a0a 0%,
+            #101827 26%,
+            #1e3a5f 48%,
+            #2563eb 70%,
+            #eaf3ff 100%
+          )
+        `,
+      }} />
+
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 640, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 28 }}>
+          <div style={{ flex: 1, maxWidth: 42, height: 2, background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.32))' }} />
+          <h2 style={{ margin: 0, fontSize: 'clamp(30px, 9vw, 42px)', fontWeight: 800, color: '#fff' }}>
+            Experience
+          </h2>
+          <div style={{ flex: 1, maxWidth: 42, height: 2, background: 'linear-gradient(to left, transparent, rgba(255,255,255,0.32))' }} />
+        </div>
+
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 8,
+              bottom: 8,
+              left: 16,
+              width: 2,
+              borderRadius: 2,
+              background: 'linear-gradient(to bottom, rgba(147,197,253,0.75), rgba(255,255,255,0.25), rgba(30,64,175,0.45))',
+              boxShadow: '0 0 18px rgba(96,165,250,0.24)',
+            }}
+          />
+          {jobs.map((job, i) => (
+            <div
+              key={job.id}
+              style={{
+                position: 'relative',
+                display: 'grid',
+                gridTemplateColumns: '34px minmax(0, 1fr)',
+                gap: 10,
+                alignItems: 'start',
+              }}
+            >
+              <div style={{
+                position: 'sticky',
+                top: 88,
+                zIndex: 3,
+                width: 34,
+                height: 34,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(145deg, rgba(15,23,42,0.96), rgba(37,99,235,0.76))',
+                border: '1px solid rgba(191,219,254,0.42)',
+                boxShadow: '0 10px 26px rgba(2,6,23,0.28), 0 0 0 5px rgba(10,10,10,0.38)',
+                color: '#ffffff',
+                fontSize: 11,
+                fontWeight: 800,
+              }}>
+                {String(i + 1).padStart(2, '0')}
+              </div>
+              <JobCard job={job} index={i} isActive mobile />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ==================== MAIN EXPERIENCE ====================
 export default function Experience() {
   const wrapperRef = useRef(null);
@@ -451,6 +607,7 @@ export default function Experience() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showHint, setShowHint] = useState(true);
   const [isReady, setIsReady] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const timer = setTimeout(() => setShowHint(false), 5000);
@@ -463,7 +620,7 @@ export default function Experience() {
   }, []);
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!isReady || isMobile) return;
 
     const wrapper = wrapperRef.current;
     const section = sectionRef.current;
@@ -566,7 +723,11 @@ export default function Experience() {
       ctx?.revert();
       window.removeEventListener('resize', handleResize);
     };
-  }, [isReady]);
+  }, [isReady, isMobile]);
+
+  if (isMobile) {
+    return <MobileExperience />;
+  }
 
   return (
     <>

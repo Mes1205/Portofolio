@@ -53,33 +53,41 @@
         spinEnterLeft 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both,
         wave 2s ease-in-out 1.5s infinite;
     }
+
+    @media (max-width: 767px) {
+      .wave-hand-right,
+      .wave-hand-left {
+        font-size: clamp(2.1rem, 11vw, 3.4rem);
+      }
+    }
   `;
 
+  const CV_PATH = '/CV_Martha-Meslina-Florencia.pdf';
+
   export default function Hero() {
-    const [showCV, setShowCV] = useState(false);
     const [isProfileHovered, setIsProfileHovered] = useState(false);
     const { isDark } = useTheme();
+
+    const openCV = () => {
+      window.location.assign(CV_PATH);
+    };
 
     return (
       <>
         <style>{keyframes}</style>
 
-        {showCV && (
-          <style>{`body { overflow: hidden; } nav { visibility: hidden !important; pointer-events: none; } .custom-cursor { display: none !important; }`}</style>
-        )}
-
         <section
           id="hero"
-          className={`flex items-center min-h-screen px-6 transition-colors ${
+          className={`flex items-center min-h-[100svh] px-4 sm:px-6 pt-24 pb-8 transition-colors ${
             isDark ? 'bg-transparent' : 'bg-transparent'
           }`}
         >
           <div className="w-full max-w-5xl mx-auto">
-            <div className="flex flex-col-reverse md:flex-row items-center gap-12 md:gap-16 text-center md:text-left">
+            <div className="flex flex-col-reverse md:flex-row items-center gap-6 sm:gap-8 md:gap-16 text-center md:text-left">
 
               {/* Kiri: teks */}
               <div className="flex-1">
-                <h1 className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
+                <h1 className={`text-[clamp(2.45rem,12vw,4.5rem)] md:text-7xl font-bold mb-4 sm:mb-6 leading-tight ${
                   isDark ? 'text-white' : 'text-slate-900'
                 }`}>
                   Hi, I&apos;m{' '}
@@ -92,36 +100,27 @@
                     Martha.
                   </span>
                 </h1>
-                <p className={`text-lg md:text-xl max-w-xl leading-relaxed mb-10 ${
+                <p className={`text-[0.98rem] sm:text-lg md:text-xl max-w-xl mx-auto md:mx-0 leading-relaxed mb-7 sm:mb-10 ${
                   isDark ? 'text-slate-300' : 'text-slate-700'
                 }`}>
-                  Crafting the future of web and AI. From developing educational chatbots to AR-based learning, I'm passionate about building tech that enhances user experiences.
+                  Crafting the future of web and AI. From developing educational chatbots to AR-based learning, I&apos;m passionate about building tech that enhances user experiences.
                 </p>
-                <div className="flex gap-4 justify-center md:justify-start flex-wrap">
+                <div className="flex justify-center md:justify-start">
                   <button
-                    onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                    className={`px-8 py-3 rounded-full font-semibold text-sm tracking-wide transition-all duration-300 text-white ${
-                      isDark
-                        ? 'bg-blue-600 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-600/40'
-                        : 'bg-slate-900 hover:bg-slate-700 hover:shadow-lg hover:shadow-slate-900/30'
-                    }`}
+                    type="button"
+                    onClick={openCV}
+                    className="inline-flex w-full md:w-auto items-center justify-center px-6 sm:px-8 py-3 rounded-full font-semibold text-sm tracking-wide text-white bg-blue-600 hover:bg-blue-500 border border-blue-500 hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-300"
                   >
-                    Lihat Project
-                  </button>
-                  <button
-                    onClick={() => setShowCV(true)}
-                    className="px-8 py-3 rounded-full font-semibold text-sm tracking-wide text-white bg-blue-600 hover:bg-blue-500 border border-blue-500 hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-300"
-                  >
-                    Lihat CV
+                    View CV
                   </button>
                 </div>
               </div>
 
               {/* Kanan: foto + waving hands */}
-              <div className="flex-shrink-0 flex flex-col items-center gap-4">
+              <div className="flex-shrink-0 flex flex-col items-center gap-3 sm:gap-4">
 
                 {/* Foto + tangan kiri & kanan */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 max-w-full">
 
                   {/* Tangan kiri — spin masuk lebih lambat */}
                   <span className="wave-hand-left" aria-hidden="true">👋</span>
@@ -130,7 +129,7 @@
                   <div
                     onMouseEnter={() => setIsProfileHovered(true)}
                     onMouseLeave={() => setIsProfileHovered(false)}
-                    className={`w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-4 shadow-xl ${
+                    className={`w-[clamp(8.8rem,42vw,13rem)] h-[clamp(8.8rem,42vw,13rem)] md:w-64 md:h-64 rounded-full overflow-hidden border-4 shadow-xl flex-shrink-0 ${
                       isDark
                         ? 'border-blue-500/20 shadow-blue-500/10'
                         : 'border-slate-200 shadow-slate-200/50'
@@ -149,14 +148,14 @@
                 </div>
 
                 {/* Social links */}
-                <div className="w-full max-w-[330px]">
+                <div className="w-full max-w-[330px] px-2 sm:px-0">
                   <p className={`text-[11px] uppercase tracking-[0.2em] mb-2 text-center ${
                     isDark ? 'text-slate-500' : 'text-slate-700'
                   }`}>
                     My Socials
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <a
                       href="https://github.com/Mes1205"
                       target="_blank"
@@ -217,65 +216,6 @@
             </div>
           </div>
         </section>
-
-        {/* CV Modal */}
-        {showCV && (
-          <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowCV(false)}
-          >
-            <div
-              className={`rounded-lg flex flex-col w-full max-w-2xl h-[95vh] ${
-                isDark ? 'bg-slate-800' : 'bg-white'
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={`flex justify-between items-center p-6 border-b ${
-                isDark ? 'border-slate-700' : 'border-slate-200'
-              }`}>
-                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  CV - Martha Meslina Florencia
-                </h2>
-                <button
-                  onClick={() => setShowCV(false)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg transition cursor-pointer ${
-                    isDark
-                      ? 'text-slate-400 hover:text-white hover:bg-slate-700'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  ✕
-                </button>
-              </div>
-              <div className={`flex-1 overflow-auto ${isDark ? 'bg-slate-900' : 'bg-slate-100'}`}>
-                <iframe
-                  src="/cv/CV_MarthaMeslinaFlorencia.pdf"
-                  className="w-full h-full"
-                  title="CV"
-                />
-              </div>
-              <div className={`flex justify-between items-center p-6 border-t ${
-                isDark ? 'border-slate-700' : 'border-slate-200'
-              }`}>
-                <button
-                  onClick={() => setShowCV(false)}
-                  className={`px-4 py-2 rounded-lg transition text-sm ${
-                    isDark ? 'text-slate-300 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  Tutup
-                </button>
-                <a
-                  href="/cv/CV_MarthaMeslinaFlorencia.pdf"
-                  download
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm"
-                >
-                  ⬇ Download
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
       </>
     );
   }

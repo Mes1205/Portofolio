@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from './ThemeProvider';
 import GradientBeam from '@/components/GradientBeam';
 import Hero from '@/components/Hero';
@@ -78,15 +78,15 @@ export default function Home() {
       <div style={{
         position: 'fixed',
         top: 0, left: 0,
-        width: '100vw', height: '100vh',
+        width: '100vw', height: '100svh',
         zIndex: 10,
         pointerEvents: 'auto',
       }}>
         <Hero />
       </div>
 
-      <div style={{ position: 'relative', zIndex: 30 }}>
-        <div style={{ height: `${HERO_HOLD * 100}vh` }} />
+      <div style={{ position: 'relative', zIndex: 30, pointerEvents: 'none' }}>
+        <div style={{ height: `${HERO_HOLD * 100}svh`, pointerEvents: 'none' }} />
 
         <Experience />
 

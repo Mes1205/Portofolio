@@ -31,3 +31,16 @@ body {
 a, button, [role="button"] {
   cursor: url('/cursor-hover.svg') 16 16, pointer;
 }
+
+@media (hover: none), (pointer: coarse) {
+  body,
+  a,
+  button,
+  [role="button"] {
+    cursor: auto;
+  }
+
+  .custom-cursor {
+    display: none;
+  }
+}

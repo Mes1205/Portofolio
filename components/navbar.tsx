@@ -149,12 +149,12 @@ const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
       />
 
       <nav
-        className={`fixed top-[12px] left-0 right-0 z-[100] flex justify-center px-4 transition-all duration-300 ${
+        className={`fixed top-[10px] md:top-[12px] left-0 right-0 z-[100] flex justify-center px-3 md:px-4 transition-all duration-300 ${
           isProjectModalOpen ? 'pointer-events-none opacity-0 -translate-y-2' : 'pointer-events-auto opacity-100 translate-y-0'
         }`}
         aria-hidden={isProjectModalOpen}
       >
-      <div className="relative w-full max-w-[1000px] h-[53px]">
+      <div className="relative w-full max-w-[1000px] h-[50px] md:h-[53px]">
 
         {/* Glass Background */}
         <div
@@ -172,7 +172,7 @@ const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
 
         {/* Logo / Name */}
         <div
-          className={`absolute left-[30px] top-1/2 -translate-y-1/2 cursor-pointer font-black text-[20px] tracking-tighter transition-colors ${
+          className={`absolute left-[16px] md:left-[30px] top-1/2 -translate-y-1/2 cursor-pointer font-black text-[18px] md:text-[20px] tracking-tighter transition-colors ${
             isDark ? 'text-white' : 'text-slate-900'
           }`}
           onClick={() => {
@@ -215,7 +215,7 @@ const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
         </div>
 
         {/* Contact Button & Theme Toggle */}
-        <div className="absolute right-[10px] top-1/2 -translate-y-1/2 flex items-center gap-3">
+        <div className="absolute right-[8px] md:right-[10px] top-1/2 -translate-y-1/2 flex items-center gap-2 md:gap-3">
           {/* Theme Toggle */}
           <button
             ref={themeToggleRef}
@@ -231,17 +231,51 @@ const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
           </button>
 
           {/* Contact Button */}
-          <div
-            className="h-[34px] px-5 rounded-[26px] flex items-center justify-center cursor-pointer transition-transform active:scale-95 hover:opacity-90"
+          <button
+            className="h-[34px] px-3 md:px-5 rounded-[26px] flex items-center justify-center cursor-pointer transition-transform active:scale-95 hover:opacity-90"
             style={{ background: isDark ? '#60a5fa' : '#1e1b4b' }}
             onClick={() => window.location.href = 'mailto:mmeslinafs@gmail.com'}
+            aria-label="Email Martha"
           >
             <p className="text-[12px] font-bold text-white flex items-center gap-2">
-              Let&apos;s Talk <Send size={14} />
+              <span className="hidden min-[390px]:inline">Let&apos;s Talk</span> <Send size={14} />
             </p>
-          </div>
+          </button>
         </div>
       </div>
+      </nav>
+
+      <nav
+        className={`fixed bottom-3 left-0 right-0 z-[100] px-3 md:hidden transition-all duration-300 ${
+          isProjectModalOpen ? 'pointer-events-none opacity-0 translate-y-2' : 'pointer-events-auto opacity-100 translate-y-0'
+        }`}
+        aria-hidden={isProjectModalOpen}
+      >
+        <div
+          className="mx-auto grid max-w-[420px] grid-cols-4 gap-1 rounded-[24px] border px-2 py-2"
+          style={{
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.18)',
+            background: isDark ? 'rgba(15, 23, 42, 0.82)' : 'rgba(255, 255, 255, 0.82)',
+            backdropFilter: 'blur(12px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+            boxShadow: '0 14px 42px rgba(0,0,0,0.18)',
+          }}
+        >
+          {navLinks.map((link, index) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={(e) => scrollToSection(e, link.href, index)}
+              className={`rounded-[18px] px-2 py-2 text-center text-[11px] font-bold transition ${
+                activeIndex === index
+                  ? isDark ? 'bg-blue-500/20 text-white' : 'bg-slate-900 text-white'
+                  : isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}
+            >
+              {link.label === 'Experience' ? 'Exp' : link.label}
+            </a>
+          ))}
+        </div>
       </nav>
     </>
   );

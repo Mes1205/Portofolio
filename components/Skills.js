@@ -63,18 +63,29 @@ const skillsData = [
   },
 ];
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SKILL CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
+function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark, isMobile }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const cardRef = useRef(null);
   const { Icon } = skill;
-
-  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsVisible(true), index * 60 + 100);
@@ -95,10 +106,9 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
   const organicRadius = `${20 + (index % 3) * 4}px ${16 + (index % 5) * 3}px ${24 + (index % 2) * 2}px ${18 + (index % 4) * 3}px`;
 
   const baseTransform = (() => {
-    if (!mounted) return 'scale(0.7)';
     if (!isVisible) return 'scale(0.7)';
     if (isPressed) return 'translate(var(--ox, 0px), var(--oy, 0px)) scale(0.95)';
-    if (isHovered) return 'translate(var(--ox, 0px), var(--oy, 0px)) scale(1.08) translateY(-6px)';
+    if (isHovered) return `translate(var(--ox, 0px), var(--oy, 0px)) scale(${isMobile ? 1.03 : 1.08}) translateY(${isMobile ? -3 : -6}px)`;
     return 'translate(var(--ox, 0px), var(--oy, 0px)) scale(1)';
   })();
 
@@ -115,10 +125,10 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
-        padding: '24px 18px',
-        minWidth: 120,
-        minHeight: 120,
+        gap: isMobile ? 8 : 10,
+        padding: isMobile ? '18px 12px' : '24px 18px',
+        minWidth: isMobile ? 0 : 120,
+        minHeight: isMobile ? 104 : 120,
         borderRadius: organicRadius,
         background: isHovered
           ? isDark
@@ -132,7 +142,7 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
           : isDark
             ? '1px solid rgba(255,255,255,0.08)'
             : '1px solid rgba(0,0,0,0.08)',
-        opacity: mounted ? (isVisible ? 1 : 0) : 0,
+        opacity: isVisible ? 1 : 0,
         transform: baseTransform,
         transition: [
           'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -148,6 +158,7 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
             ? '0 2px 8px rgba(0,0,0,0.3)'
             : '0 2px 8px rgba(0,0,0,0.06)',
         willChange: isHovered ? 'transform' : 'auto',
+        width: '100%',
       }}
     >
       {isHovered && (
@@ -168,17 +179,19 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
         transform: isHovered ? 'scale(1.15) rotate(-5deg)' : 'scale(1) rotate(0deg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <Icon size={36} color={skill.color} />
+        <Icon size={isMobile ? 30 : 36} color={skill.color} />
       </div>
 
       <span style={{
-        fontSize: 12,
+        fontSize: isMobile ? 11 : 12,
         fontWeight: 700,
         letterSpacing: '0.04em',
         color: isHovered ? skill.color : isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
         transition: 'color 0.3s ease',
         textAlign: 'center',
-        whiteSpace: 'nowrap',
+        whiteSpace: 'normal',
+        lineHeight: 1.2,
+        overflowWrap: 'anywhere',
       }}>
         {skill.name}
       </span>
@@ -199,7 +212,7 @@ function SkillCard({ skill, index, isHovered, onHover, onLeave, isDark }) {
 // SKILL CATEGORY
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave, startIndex }) {
+function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave, startIndex, isMobile }) {
   const [catVisible, setCatVisible] = useState(false);
 
   useEffect(() => {
@@ -208,18 +221,18 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
   }, [startIndex]);
 
   return (
-    <div style={{ marginBottom: 48 }}>
+    <div style={{ marginBottom: isMobile ? 34 : 48 }}>
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 12,
-        marginBottom: 24,
+        gap: isMobile ? 10 : 12,
+        marginBottom: isMobile ? 16 : 24,
         opacity: catVisible ? 1 : 0,
         transform: catVisible ? 'translateX(0)' : 'translateX(-20px)',
         transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
         <div style={{
-          width: 24, height: 2, borderRadius: 1,
+          width: isMobile ? 18 : 24, height: 2, borderRadius: 1,
           background: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
         }} />
         <h3 style={{
@@ -235,7 +248,13 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
         }} />
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-start' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(auto-fit, minmax(120px, max-content))',
+        gap: isMobile ? 10 : 16,
+        alignItems: 'stretch',
+        justifyContent: isMobile ? 'stretch' : 'start',
+      }}>
         {items.map((skill, i) => (
           <SkillCard
             key={skill.name}
@@ -245,6 +264,7 @@ function SkillCategory({ category, items, isDark, hoveredSkill, onHover, onLeave
             onHover={onHover}
             onLeave={onLeave}
             isDark={isDark}
+            isMobile={isMobile}
           />
         ))}
       </div>
@@ -359,6 +379,7 @@ function FloatingParticles({ isDark }) {
 
 export default function Skills() {
   const { isDark } = useTheme();
+  const isMobile = useIsMobile();
   const [hoveredSkill, setHoveredSkill] = useState(null);
   const [headerVisible, setHeaderVisible] = useState(false);
   const sectionRef = useRef(null);
@@ -382,7 +403,7 @@ export default function Skills() {
       const total = end - start;
       const current = -start;
       const p = Math.max(0, Math.min(1, current / total));
-      const scatterRadius = 150 * (1 - p);
+      const scatterRadius = (isMobile ? 28 : 150) * (1 - p);
 
       const cards = section.querySelectorAll('[data-cos-a]');
       for (const card of cards) {
@@ -409,9 +430,14 @@ export default function Skills() {
       window.removeEventListener('scroll', onScroll);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [isMobile]);
 
-  let globalIndex = 0;
+  const categoriesWithStart = skillsData.reduce((acc, cat) => {
+    const startIndex = acc.total;
+    acc.items.push({ ...cat, startIndex });
+    acc.total += cat.items.length;
+    return acc;
+  }, { items: [], total: 0 }).items;
 
   return (
     <section
@@ -433,20 +459,20 @@ export default function Skills() {
         zIndex: 1,
         maxWidth: 1200,
         margin: '0 auto',
-        padding: '100px 24px 80px',
+        padding: isMobile ? '76px 16px 64px' : '100px 24px 80px',
       }}>
         {/* Header */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 16,
-          marginBottom: 60,
+          gap: isMobile ? 12 : 16,
+          marginBottom: isMobile ? 40 : 60,
           opacity: headerVisible ? 1 : 0,
           transform: headerVisible ? 'translateY(0)' : 'translateY(-20px)',
           transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
         }}>
           <div style={{
-            width: 50, height: 2, borderRadius: 1,
+            width: isMobile ? 34 : 50, height: 2, borderRadius: 1,
             background: isDark
               ? 'linear-gradient(to right, transparent, rgba(255,255,255,0.3))'
               : 'linear-gradient(to right, transparent, rgba(0,0,0,0.2))',
@@ -454,7 +480,7 @@ export default function Skills() {
           <h2 style={{
             fontSize: 'clamp(32px, 4vw, 52px)',
             fontWeight: 700,
-            letterSpacing: '-0.02em',
+            letterSpacing: 0,
             color: isDark ? '#ffffff' : '#0a0a0a',
             fontFamily: "'Poppins', sans-serif",
             margin: 0,
@@ -474,7 +500,7 @@ export default function Skills() {
             ))}
           </h2>
           <div style={{
-            width: 50, height: 2, borderRadius: 1,
+            width: isMobile ? 34 : 50, height: 2, borderRadius: 1,
             background: isDark
               ? 'linear-gradient(to left, transparent, rgba(255,255,255,0.3))'
               : 'linear-gradient(to left, transparent, rgba(0,0,0,0.2))',
@@ -482,9 +508,7 @@ export default function Skills() {
         </div>
 
         {/* Skill categories */}
-        {skillsData.map((cat) => {
-          const start = globalIndex;
-          globalIndex += cat.items.length;
+        {categoriesWithStart.map((cat) => {
           return (
             <SkillCategory
               key={cat.category}
@@ -494,7 +518,8 @@ export default function Skills() {
               hoveredSkill={hoveredSkill}
               onHover={setHoveredSkill}
               onLeave={() => setHoveredSkill(null)}
-              startIndex={start}
+              startIndex={cat.startIndex}
+              isMobile={isMobile}
             />
           );
         })}

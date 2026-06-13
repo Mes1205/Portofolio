@@ -1092,7 +1092,7 @@ export default function Projects() {
 
                       <div className="modal-scroll" style={{ flex: 1, overflowY: isMobile ? 'visible' : 'auto', padding: isMobile ? '22px 18px' : '28px 36px', display: 'flex', flexDirection: 'column', gap: isMobile ? 24 : 32 }}>
                         <div>
-                          <Label>Tentang</Label>
+                          <Label>About</Label>
                           <p style={{ fontSize: 15, lineHeight: 1.7, color: C.textSub, margin: 0 }}>{activeProject.desc}</p>
                         </div>
                         <div>
@@ -1111,7 +1111,7 @@ export default function Projects() {
                           </div>
                         </div>
                         <div>
-                          <Label>Kontribusi</Label>
+                          <Label>Contributions</Label>
                           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
                             {activeProject.whatIDid.map((item, idx) => (
                               <li key={idx} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>

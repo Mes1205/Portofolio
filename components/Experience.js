@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { ArrowRight, MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // ==================== DATA JOBS ====================
 const jobs = [
@@ -79,7 +83,7 @@ const jobs = [
 
 const N = jobs.length;
 export const EXPERIENCE_INITIAL_IMAGE_SOURCES = Array.from(
-  new Set(jobs[0].images.map((image) => image.src))
+  new Set([jobs[0].images[0].src])
 );
 
 const waitFrames = (count = 1) => new Promise((resolve) => {
@@ -95,7 +99,7 @@ const waitFrames = (count = 1) => new Promise((resolve) => {
   requestAnimationFrame(next);
 });
 
-const waitForFonts = (timeout = 600) => {
+const waitForFonts = (timeout = 120) => {
   if (!document.fonts?.ready) return Promise.resolve();
   return Promise.race([
     document.fonts.ready,
@@ -324,7 +328,7 @@ function PhotoGallery({ images, isVisible, compact = false }) {
             <img
               src={img.src}
               alt={img.alt}
-              loading={isVisible ? 'eager' : 'lazy'}
+              loading="lazy"
               decoding="async"
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
@@ -375,6 +379,85 @@ function ScrollHint({ isVisible }) {
   );
 }
 
+function ExperienceLoadingCue({ isVisible, activeIndex, onPrev, onNext }) {
+  if (!isVisible) return null;
+
+  const buttonStyle = {
+    width: 34,
+    height: 34,
+    borderRadius: '50%',
+    border: '1px solid rgba(191,219,254,0.18)',
+    background: 'rgba(255,255,255,0.08)',
+    color: 'rgba(255,255,255,0.82)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    backdropFilter: 'blur(10px)',
+  };
+
+  return (
+    <div style={{
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: '8%',
+      zIndex: 20,
+      display: 'flex',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '8px 10px',
+        borderRadius: 999,
+        background: 'rgba(2,6,23,0.42)',
+        border: '1px solid rgba(191,219,254,0.18)',
+        color: 'rgba(255,255,255,0.68)',
+        fontSize: 12,
+        fontWeight: 700,
+        letterSpacing: '0.08em',
+        backdropFilter: 'blur(12px)',
+        boxShadow: '0 14px 34px rgba(2,6,23,0.24)',
+        pointerEvents: 'auto',
+      }}>
+        <button
+          type="button"
+          onClick={onPrev}
+          aria-label="Previous experience"
+          style={buttonStyle}
+        >
+          <ChevronLeft size={17} />
+        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 172 }}>
+          <span>PREPARING EXPERIENCE</span>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            color: 'rgba(255,255,255,0.42)',
+            fontSize: 10,
+            letterSpacing: '0.12em',
+          }}>
+            {String(activeIndex + 1).padStart(2, '0')} / {String(N).padStart(2, '0')}
+            <ArrowRight size={12} style={{ animation: 'scroll-bounce 1.2s ease-in-out infinite' }} />
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={onNext}
+          aria-label="Next experience"
+          style={buttonStyle}
+        >
+          <ChevronRight size={17} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function JobCard({ job, index, isActive, mobile = false }) {
   const [contentVisible, setContentVisible] = useState(false);
 
@@ -391,7 +474,7 @@ function JobCard({ job, index, isActive, mobile = false }) {
   }, [isActive]);
 
   return (
-    <div style={{
+    <div data-exp-card={mobile ? undefined : index} style={{
       flexShrink: 0,
       width: mobile ? '100%' : 'min(90vw, 1100px)',
       position: 'relative',
@@ -529,10 +612,20 @@ function JobCard({ job, index, isActive, mobile = false }) {
   );
 }
 
-function ProgressBar({ progress }) {
+function ProgressBar({ progressRef }) {
   return (
     <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 2, zIndex: 10, background: 'rgba(255,255,255,0.03)' }}>
-      <div style={{ height: '100%', width: `${progress * 100}%`, background: 'linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.5))', transition: 'width 0.05s linear' }} />
+      <div
+        ref={progressRef}
+        style={{
+          height: '100%',
+          width: '100%',
+          background: 'linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.5))',
+          transform: 'scaleX(0)',
+          transformOrigin: 'left center',
+          willChange: 'transform',
+        }}
+      />
     </div>
   );
 }
@@ -629,24 +722,57 @@ function MobileExperience() {
 }
 
 // ==================== MAIN EXPERIENCE ====================
-export default function Experience({ onReady }) {
+export default function Experience({ onReady } = {}) {
   const wrapperRef = useRef(null);
   const sectionRef = useRef(null);
   const scrollboxRef = useRef(null);
   const gradientRef = useRef(null);
   const contentRef = useRef(null);
+  const progressRef = useRef(null);
+  const activeIndexRef = useRef(0);
+  const progressValueRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [showHint, setShowHint] = useState(true);
   const [isReady, setIsReady] = useState(false);
+  const [isScrollReady, setIsScrollReady] = useState(false);
   const isMobile = useIsMobile();
   const hasReportedReadyRef = useRef(false);
 
   const reportReady = useCallback(() => {
     if (hasReportedReadyRef.current) return;
     hasReportedReadyRef.current = true;
+    setIsScrollReady(true);
+    window.dispatchEvent(new CustomEvent('experience-ready'));
     onReady?.();
   }, [onReady]);
+
+  const setProgressVisual = useCallback((progress) => {
+    const clamped = Math.max(0, Math.min(1, progress));
+    progressValueRef.current = clamped;
+    if (progressRef.current) {
+      progressRef.current.style.transform = `scaleX(${clamped})`;
+    }
+  }, []);
+
+  const goToExperience = useCallback((nextIndex) => {
+    const index = (nextIndex + N) % N;
+    const scrollbox = scrollboxRef.current;
+    const maxX = scrollbox ? Math.max(0, scrollbox.scrollWidth - window.innerWidth) : 0;
+
+    activeIndexRef.current = index;
+    setActiveIndex(index);
+    setProgressVisual(N > 1 ? index / (N - 1) : 0);
+
+    if (!scrollbox) return;
+
+    const card = scrollbox.querySelector(`[data-exp-card="${index}"]`);
+    const fallbackLeft = N > 1 ? maxX * (index / (N - 1)) : 0;
+    const targetLeft = card
+      ? Math.min(maxX, Math.max(0, card.offsetLeft - window.innerWidth * 0.08))
+      : fallbackLeft;
+
+    scrollbox.scrollTo({ left: targetLeft, behavior: 'smooth' });
+  }, [setProgressVisual]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowHint(false), 5000);
@@ -654,12 +780,14 @@ export default function Experience({ onReady }) {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsReady(true), 100);
-    return () => clearTimeout(timer);
+    const frame = requestAnimationFrame(() => setIsReady(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    if (isMobile) reportReady();
+    if (!isMobile) return;
+    const frame = requestAnimationFrame(reportReady);
+    return () => cancelAnimationFrame(frame);
   }, [isMobile, reportReady]);
 
   useEffect(() => {
@@ -673,19 +801,13 @@ export default function Experience({ onReady }) {
     if (!wrapper || !section || !scrollbox || !gradient || !content) return;
 
     let ctx = null;
-    let scrollTrigger = null;
-
     let cancelled = false;
 
     async function init() {
-      const { gsap } = await import('gsap');
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
       if (cancelled) return;
-      scrollTrigger = ScrollTrigger;
-      gsap.registerPlugin(ScrollTrigger);
 
       await waitForFonts();
-      await waitFrames(2);
+      await waitFrames(1);
       if (cancelled) return;
 
       const getMaxX = () => Math.max(0, scrollbox.scrollWidth - window.innerWidth);
@@ -737,8 +859,15 @@ export default function Experience({ onReady }) {
             scrollbox.scrollLeft = proxy.value;
             const maxX = getMaxX();
             const progress = maxX > 0 ? proxy.value / maxX : 0;
-            setScrollProgress(progress);
-            setActiveIndex(Math.min(N - 1, Math.floor(progress * N)));
+            if (Math.abs(progress - progressValueRef.current) > 0.004) {
+              setProgressVisual(progress);
+            }
+
+            const nextIndex = Math.min(N - 1, Math.floor(progress * N));
+            if (nextIndex !== activeIndexRef.current) {
+              activeIndexRef.current = nextIndex;
+              setActiveIndex(nextIndex);
+            }
           },
           scrollTrigger: {
             id: 'experience-horizontal',
@@ -756,9 +885,9 @@ export default function Experience({ onReady }) {
 
       }, section);
 
-      for (let attempt = 0; attempt < 4; attempt += 1) {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
         ScrollTrigger.refresh();
-        await waitFrames(attempt === 0 ? 2 : 1);
+        await waitFrames(1);
         if (cancelled) return;
 
         const horizontalTrigger = ScrollTrigger.getById('experience-horizontal');
@@ -782,7 +911,7 @@ export default function Experience({ onReady }) {
     });
 
     const handleResize = () => {
-      scrollTrigger?.refresh();
+      ScrollTrigger.refresh();
     };
     window.addEventListener('resize', handleResize);
 
@@ -791,7 +920,7 @@ export default function Experience({ onReady }) {
       ctx?.revert();
       window.removeEventListener('resize', handleResize);
     };
-  }, [isReady, isMobile, reportReady]);
+  }, [isReady, isMobile, reportReady, setProgressVisual]);
 
   if (isMobile) {
     return <MobileExperience />;
@@ -803,6 +932,10 @@ export default function Experience({ onReady }) {
         @keyframes scroll-bounce {
           0%, 100% { transform: translateX(0); }
           50% { transform: translateX(6px); }
+        }
+        @keyframes cue-down {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(5px); }
         }
       `}</style>
 
@@ -867,7 +1000,13 @@ export default function Experience({ onReady }) {
             }} />
 
             <ExperienceHeader />
-            <ScrollHint isVisible={showHint} />
+            <ScrollHint isVisible={showHint && isScrollReady} />
+            <ExperienceLoadingCue
+              isVisible={!isScrollReady}
+              activeIndex={activeIndex}
+              onPrev={() => goToExperience(activeIndex - 1)}
+              onNext={() => goToExperience(activeIndex + 1)}
+            />
 
             <div style={{
               position: 'absolute',
@@ -897,7 +1036,6 @@ export default function Experience({ onReady }) {
 
             <div
               ref={scrollboxRef}
-              id="experience" 
               className="hide-scrollbar"
               style={{
                 position: 'absolute',
@@ -923,12 +1061,17 @@ export default function Experience({ onReady }) {
                 }}
               >
                 {jobs.map((job, i) => (
-                  <JobCard key={job.id} job={job} index={i} isActive={i === activeIndex} />
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    index={i}
+                    isActive={i === activeIndex}
+                  />
                 ))}
               </div>
             </div>
 
-            <ProgressBar progress={scrollProgress} />
+            <ProgressBar progressRef={progressRef} />
           </div>
         </div>
       </div>

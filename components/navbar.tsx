@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Send, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/app/ThemeProvider';
+
+const navLinks = [
+  { label: 'Home', href: '#hero' },
+  { label: 'Projects', href: '#projects' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Skills', href: '#skills' },
+];
 
 export default function Navbar() {
   const { isDark, toggleTheme, isProjectModalOpen } = useTheme();
@@ -14,13 +21,6 @@ export default function Navbar() {
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const themeToggleRef = useRef<HTMLButtonElement>(null);
 
-  const navLinks = [
-    { label: 'Home',       href: '#hero' },
-    { label: 'Projects',   href: '#projects' },
-    { label: 'Experience', href: '#experience' },
-    { label: 'Skills',     href: '#skills' },
-  ];
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -29,22 +29,22 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const updateSpotlightPosition = () => {
-      if (!themeToggleRef.current) return;
-      const rect = themeToggleRef.current.getBoundingClientRect();
-      setSpotlightPos({
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-      });
-    };
+  const updateSpotlightPosition = useCallback(() => {
+    if (!themeToggleRef.current) return;
+    const rect = themeToggleRef.current.getBoundingClientRect();
+    setSpotlightPos({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+  }, []);
 
+  useEffect(() => {
     updateSpotlightPosition();
     window.addEventListener('resize', updateSpotlightPosition);
     return () => window.removeEventListener('resize', updateSpotlightPosition);
-  }, []);
+  }, [updateSpotlightPosition]);
 
-  const updateHighlight = () => {
+  const updateHighlight = useCallback(() => {
     const activeEl = linkRefs.current[activeIndex];
     const wrapEl = linksWrapRef.current;
     if (!activeEl || !wrapEl) return;
@@ -57,46 +57,63 @@ export default function Navbar() {
       width: linkRect.width + 24,
       opacity: 1,
     });
-  };
+  }, [activeIndex]);
 
   // Update highlight position to match the active link element exactly
   useEffect(() => {
     updateHighlight();
     window.addEventListener('resize', updateHighlight);
     return () => window.removeEventListener('resize', updateHighlight);
-  }, [activeIndex]);
+  }, [updateHighlight]);
 
-  // Follow active section while scrolling in <main>
+  // Follow active section in the document scroll. Hero is fixed and Experience is GSAP-pinned,
+  // so direct scroll positions are more reliable than IntersectionObserver here.
   useEffect(() => {
-    const mainEl = document.querySelector('main');
-    if (!mainEl) return;
+    let frame = 0;
 
-    const sectionIds = navLinks.map((l) => l.href.replace('#', ''));
-    const sectionToIndex = new Map(sectionIds.map((id, idx) => [id, idx]));
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-        if (visible.length === 0) return;
-        const id = visible[0].target.id;
-        const idx = sectionToIndex.get(id);
-        if (typeof idx === 'number') setActiveIndex(idx);
-      },
-      {
-        root: mainEl,
-        threshold: [0.35, 0.5, 0.7],
-      }
-    );
-
-    sectionIds.forEach((id) => {
+    const getPageTop = (id: string) => {
       const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+      if (!el) return Number.POSITIVE_INFINITY;
+      return el.getBoundingClientRect().top + window.scrollY;
+    };
 
-    return () => observer.disconnect();
+    const updateActiveSection = () => {
+      frame = 0;
+      const scrollY = window.scrollY;
+      const viewport = window.innerHeight;
+      const probeY = scrollY + viewport * 0.38;
+
+      const experienceTop = getPageTop('experience');
+      const projectsTop = getPageTop('projects');
+      const skillsTop = getPageTop('skills');
+
+      if (scrollY < viewport * 0.72) {
+        setActiveIndex(0);
+      } else if (probeY >= skillsTop) {
+        setActiveIndex(3);
+      } else if (probeY >= projectsTop) {
+        setActiveIndex(1);
+      } else if (probeY >= experienceTop) {
+        setActiveIndex(2);
+      } else {
+        setActiveIndex(0);
+      }
+    };
+
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(updateActiveSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+    };
   }, []);
 
   // components/Navbar.jsx

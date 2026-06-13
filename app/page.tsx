@@ -43,7 +43,8 @@ export default function Home() {
   const { isDark } = useTheme();
   const [assetsReady, setAssetsReady] = useState(false);
   const [experienceReady, setExperienceReady] = useState(false);
-  const isReady = assetsReady && experienceReady;
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+  const isReady = assetsReady && (experienceReady || loadingTimedOut);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,6 +64,19 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    if (experienceReady) return;
+
+    const timer = window.setTimeout(() => setLoadingTimedOut(true), 10000);
+    return () => window.clearTimeout(timer);
+  }, [experienceReady]);
+
+  useEffect(() => {
+    const handleExperienceReady = () => setExperienceReady(true);
+    window.addEventListener('experience-ready', handleExperienceReady);
+    return () => window.removeEventListener('experience-ready', handleExperienceReady);
   }, []);
 
   useEffect(() => {
@@ -124,7 +138,7 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 30, pointerEvents: 'none' }}>
         <div style={{ height: `${HERO_HOLD * 100}svh`, pointerEvents: 'none' }} />
 
-        <Experience onReady={() => setExperienceReady(true)} />
+        <Experience />
 
         <div
           style={{

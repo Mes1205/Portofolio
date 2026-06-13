@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useTheme } from './ThemeProvider';
 import GradientBeam from '@/components/GradientBeam';
 import Hero from '@/components/Hero';
-import Experience, { EXPERIENCE_IMAGE_SOURCES } from '@/components/Experience';
+import Experience, { EXPERIENCE_INITIAL_IMAGE_SOURCES } from '@/components/Experience';
 import Projects from '@/components/Projects';
 import Skills from '@/components/Skills';
 
@@ -12,21 +13,20 @@ export const HERO_HOLD = 1;
 export const EXP_SLIDE = 1;
 export const EXP_HOLD = 0.5;
 
-function waitForPageLoad() {
-  if (document.readyState === 'complete') return Promise.resolve();
-
-  return new Promise<void>((resolve) => {
-    window.addEventListener('load', () => resolve(), { once: true });
-  });
-}
-
 function waitForFonts() {
   return document.fonts?.ready ?? Promise.resolve();
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number) {
+  return Promise.race([
+    promise,
+    new Promise<void>((resolve) => setTimeout(resolve, ms)),
+  ]);
+}
+
 function preloadImage(src: string) {
   return new Promise<void>((resolve) => {
-    const image = new Image();
+    const image = new window.Image();
     image.onload = () => {
       if ('decode' in image) {
         image.decode().then(() => resolve()).catch(() => resolve());
@@ -43,16 +43,16 @@ export default function Home() {
   const { isDark } = useTheme();
   const [assetsReady, setAssetsReady] = useState(false);
   const [experienceReady, setExperienceReady] = useState(false);
-  const isReady = assetsReady && experienceReady;
+  const [readyFallback, setReadyFallback] = useState(false);
+  const isReady = assetsReady && (experienceReady || readyFallback);
 
   useEffect(() => {
     let cancelled = false;
 
     async function preparePage() {
       await Promise.all([
-        waitForPageLoad(),
-        waitForFonts(),
-        Promise.all(EXPERIENCE_IMAGE_SOURCES.map(preloadImage)),
+        withTimeout(waitForFonts(), 1200),
+        withTimeout(Promise.all(EXPERIENCE_INITIAL_IMAGE_SOURCES.map(preloadImage)), 1800),
       ]);
 
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -65,6 +65,13 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (experienceReady) return;
+
+    const timer = window.setTimeout(() => setReadyFallback(true), 2500);
+    return () => window.clearTimeout(timer);
+  }, [experienceReady]);
 
   useEffect(() => {
     if (isReady) return;
@@ -84,6 +91,14 @@ export default function Home() {
         html, body { margin: 0; padding: 0; overflow-x: hidden; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes loader-scan {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(260%); }
+        }
+        @keyframes loader-pop {
+          0%, 100% { transform: translateY(0); opacity: 0.38; }
+          45% { transform: translateY(-7px); opacity: 1; }
+        }
       `}</style>
 
       <div
@@ -150,17 +165,76 @@ export default function Home() {
 
       <div
         aria-hidden={isReady}
-        className={`fixed inset-0 flex flex-col items-center justify-center bg-black z-[200] transition-opacity duration-500 ${
+        className={`fixed inset-0 flex flex-col items-center justify-center z-[200] transition-opacity duration-500 ${
           isReady ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100'
         }`}
+        style={{
+          background:
+            'radial-gradient(circle at 50% 38%, rgba(28, 70, 161, 0.22), transparent 32%), linear-gradient(180deg, #020617 0%, #050816 55%, #020617 100%)',
+        }}
       >
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
-          <div className="absolute inset-0 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
+        <div
+          className="relative flex items-center justify-center rounded-[32px]"
+          style={{
+            width: 'min(280px, 70vw)',
+            aspectRatio: '1 / 1',
+            overflow: 'hidden',
+          }}
+        >
+          <Image
+            src="/loading.gif"
+            alt=""
+            width={500}
+            height={500}
+            priority
+            unoptimized
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
         </div>
-        <p className="mt-4 text-white/60 text-sm tracking-wider font-mono animate-pulse">
-          LOADING PORTFOLIO...
+
+        <div className="-mt-3 flex items-center gap-2">
+          {[0, 1, 2].map((dot) => (
+            <span
+              key={dot}
+              className="rounded-full"
+              style={{
+                width: 7,
+                height: 7,
+                background: dot === 1 ? '#0073ff' : '#7db5ff',
+                animation: `loader-pop 1s ease-in-out ${dot * 0.12}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
+        <p className="mt-2 text-white/75 text-xs tracking-[0.22em] font-mono">
+          WARMING UP THE PORTFOLIO ^^
         </p>
+
+        <div
+          className="mt-2 overflow-hidden rounded-full"
+          style={{
+            width: 'min(220px, 60vw)',
+            height: 6,
+            background: 'rgba(255,255,255,0.09)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <div
+            style={{
+              width: '45%',
+              height: '100%',
+              borderRadius: 999,
+              background: 'linear-gradient(90deg, #60a5fa, #159bfa, #a671fb)',
+              animation: 'loader-scan 1.25s ease-in-out infinite',
+            }}
+          />
+        </div>
       </div>
     </>
   );

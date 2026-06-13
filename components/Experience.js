@@ -78,8 +78,8 @@ const jobs = [
 ];
 
 const N = jobs.length;
-export const EXPERIENCE_IMAGE_SOURCES = Array.from(
-  new Set(jobs.flatMap((job) => job.images.map((image) => image.src)))
+export const EXPERIENCE_INITIAL_IMAGE_SOURCES = Array.from(
+  new Set(jobs[0].images.map((image) => image.src))
 );
 
 function useIsMobile(breakpoint = 768) {
@@ -223,6 +223,8 @@ function PhotoGallery({ images, isVisible, compact = false }) {
         <img
           src={images[currentIndex].src}
           alt={images[currentIndex].alt}
+          loading={isVisible ? 'eager' : 'lazy'}
+          decoding="async"
           style={{
             width: '100%', height: '100%', objectFit: 'cover', display: 'block',
             transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -298,7 +300,13 @@ function PhotoGallery({ images, isVisible, compact = false }) {
             pointerEvents: 'none', background: '#111',
             filter: isNear ? 'brightness(0.85) blur(0.5px)' : 'brightness(0.7) blur(1px)',
           }}>
-            <img src={img.src} alt={img.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img
+              src={img.src}
+              alt={img.alt}
+              loading={isVisible ? 'eager' : 'lazy'}
+              decoding="async"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
           </div>
         );
       })}

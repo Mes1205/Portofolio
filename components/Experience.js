@@ -82,6 +82,27 @@ export const EXPERIENCE_INITIAL_IMAGE_SOURCES = Array.from(
   new Set(jobs[0].images.map((image) => image.src))
 );
 
+const waitFrames = (count = 1) => new Promise((resolve) => {
+  let frame = 0;
+  const next = () => {
+    frame += 1;
+    if (frame >= count) {
+      resolve();
+      return;
+    }
+    requestAnimationFrame(next);
+  };
+  requestAnimationFrame(next);
+});
+
+const waitForFonts = (timeout = 600) => {
+  if (!document.fonts?.ready) return Promise.resolve();
+  return Promise.race([
+    document.fonts.ready,
+    new Promise((resolve) => setTimeout(resolve, timeout)),
+  ]);
+};
+
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -663,13 +684,12 @@ export default function Experience({ onReady }) {
       scrollTrigger = ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
 
-      await document.fonts.ready;
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await waitForFonts();
+      await waitFrames(2);
       if (cancelled) return;
 
       const getMaxX = () => Math.max(0, scrollbox.scrollWidth - window.innerWidth);
       scrollbox.scrollLeft = 0;
-      const waitFrames = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       ctx = gsap.context(() => {
 
@@ -736,9 +756,9 @@ export default function Experience({ onReady }) {
 
       }, section);
 
-      for (let attempt = 0; attempt < 8; attempt += 1) {
+      for (let attempt = 0; attempt < 4; attempt += 1) {
         ScrollTrigger.refresh();
-        await waitFrames();
+        await waitFrames(attempt === 0 ? 2 : 1);
         if (cancelled) return;
 
         const horizontalTrigger = ScrollTrigger.getById('experience-horizontal');
@@ -752,7 +772,7 @@ export default function Experience({ onReady }) {
       }
 
       ScrollTrigger.refresh();
-      await waitFrames();
+      await waitFrames(1);
       if (!cancelled) reportReady();
     }
 

@@ -99,13 +99,16 @@ export default function Home() {
       `}</style>
 
       <div
-        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-700"
-        style={{ opacity: isDark ? 0.42 : 0.62 }}
+        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-200"
+        style={{
+          opacity: isDark ? 0.62 : 0.62,
+          backgroundColor: isDark ? '#020202' : 'transparent',
+        }}
       >
         <GradientBeam />
       </div>
       <div className={`fixed inset-0 z-[1] pointer-events-none ${
-        isDark ? 'bg-slate-950/38' : 'bg-white/20'
+        isDark ? 'bg-black/30' : 'bg-white/20'
       }`} />
 
       <div style={{

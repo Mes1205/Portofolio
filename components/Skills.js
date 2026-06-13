@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useTheme } from '@/app/ThemeProvider';
 import {
   SiReact, SiNextdotjs, SiTailwindcss, SiTypescript, SiJavascript,
   SiHtml5, SiNodedotjs, SiSupabase, SiPostgresql, SiUnity,
@@ -378,7 +377,7 @@ function FloatingParticles({ isDark }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function Skills() {
-  const { isDark } = useTheme();
+  const isDark = true;
   const isMobile = useIsMobile();
   const [hoveredSkill, setHoveredSkill] = useState(null);
   const [headerVisible, setHeaderVisible] = useState(false);

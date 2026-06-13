@@ -91,7 +91,8 @@ export default function GradientBeam() {
         for (let i = 0; i <= segments; i++) {
           const x = startX + i * stepX;
           const y = beam.yBase * H + Math.sin(x * beam.frequency + beam.phase) * beam.amplitude;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
 
         const glowGrad = ctx.createLinearGradient(startX, 0, endX, 0);
@@ -112,7 +113,8 @@ export default function GradientBeam() {
         for (let i = 0; i <= segments; i++) {
           const x = startX + i * stepX;
           const y = beam.yBase * H + Math.sin(x * beam.frequency + beam.phase) * beam.amplitude;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
 
         const midGrad = ctx.createLinearGradient(startX, 0, endX, 0);
@@ -131,7 +133,8 @@ export default function GradientBeam() {
         for (let i = 0; i <= segments; i++) {
           const x = startX + i * stepX;
           const y = beam.yBase * H + Math.sin(x * beam.frequency + beam.phase) * beam.amplitude;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
 
         const coreGrad = ctx.createLinearGradient(startX, 0, endX, 0);
@@ -150,7 +153,7 @@ export default function GradientBeam() {
       rafRef.current = requestAnimationFrame(draw);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    draw(performance.now());
 
     return () => {
       cancelAnimationFrame(rafRef.current);

@@ -78,6 +78,9 @@ const jobs = [
 ];
 
 const N = jobs.length;
+export const EXPERIENCE_IMAGE_SOURCES = Array.from(
+  new Set(jobs.flatMap((job) => job.images.map((image) => image.src)))
+);
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(false);
@@ -597,7 +600,7 @@ function MobileExperience() {
 }
 
 // ==================== MAIN EXPERIENCE ====================
-export default function Experience() {
+export default function Experience({ onReady }) {
   const wrapperRef = useRef(null);
   const sectionRef = useRef(null);
   const scrollboxRef = useRef(null);
@@ -608,6 +611,13 @@ export default function Experience() {
   const [showHint, setShowHint] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const isMobile = useIsMobile();
+  const hasReportedReadyRef = useRef(false);
+
+  const reportReady = useCallback(() => {
+    if (hasReportedReadyRef.current) return;
+    hasReportedReadyRef.current = true;
+    onReady?.();
+  }, [onReady]);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowHint(false), 5000);
@@ -618,6 +628,10 @@ export default function Experience() {
     const timer = setTimeout(() => setIsReady(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isMobile) reportReady();
+  }, [isMobile, reportReady]);
 
   useEffect(() => {
     if (!isReady || isMobile) return;
@@ -632,14 +646,18 @@ export default function Experience() {
     let ctx = null;
     let scrollTrigger = null;
 
+    let cancelled = false;
+
     async function init() {
       const { gsap } = await import('gsap');
       const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      if (cancelled) return;
       scrollTrigger = ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
 
       await document.fonts.ready;
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      if (cancelled) return;
 
       const getMaxX = () => Math.max(0, scrollbox.scrollWidth - window.innerWidth);
       scrollbox.scrollLeft = 0;
@@ -710,9 +728,13 @@ export default function Experience() {
       }, section);
 
       ScrollTrigger.refresh();
+      requestAnimationFrame(reportReady);
     }
 
-    init();
+    init().catch((error) => {
+      console.error('Failed to initialize Experience scroll animation:', error);
+      reportReady();
+    });
 
     const handleResize = () => {
       scrollTrigger?.refresh();
@@ -720,10 +742,11 @@ export default function Experience() {
     window.addEventListener('resize', handleResize);
 
     return () => {
+      cancelled = true;
       ctx?.revert();
       window.removeEventListener('resize', handleResize);
     };
-  }, [isReady, isMobile]);
+  }, [isReady, isMobile, reportReady]);
 
   if (isMobile) {
     return <MobileExperience />;

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from './ThemeProvider';
 import GradientBeam from '@/components/GradientBeam';
 import Hero from '@/components/Hero';
-import Experience from '@/components/Experience';
+import Experience, { EXPERIENCE_IMAGE_SOURCES } from '@/components/Experience';
 import Projects from '@/components/Projects';
 import Skills from '@/components/Skills';
 
@@ -12,49 +12,70 @@ export const HERO_HOLD = 1;
 export const EXP_SLIDE = 1;
 export const EXP_HOLD = 0.5;
 
+function waitForPageLoad() {
+  if (document.readyState === 'complete') return Promise.resolve();
+
+  return new Promise<void>((resolve) => {
+    window.addEventListener('load', () => resolve(), { once: true });
+  });
+}
+
+function waitForFonts() {
+  return document.fonts?.ready ?? Promise.resolve();
+}
+
+function preloadImage(src: string) {
+  return new Promise<void>((resolve) => {
+    const image = new Image();
+    image.onload = () => {
+      if ('decode' in image) {
+        image.decode().then(() => resolve()).catch(() => resolve());
+        return;
+      }
+      resolve();
+    };
+    image.onerror = () => resolve();
+    image.src = src;
+  });
+}
+
 export default function Home() {
   const { isDark } = useTheme();
-  const [isReady, setIsReady] = useState(false);
+  const [assetsReady, setAssetsReady] = useState(false);
+  const [experienceReady, setExperienceReady] = useState(false);
+  const isReady = assetsReady && experienceReady;
 
   useEffect(() => {
-    let done = false;
+    let cancelled = false;
 
-    const markReady = () => {
-      if (done) return;
-      done = true;
-      // Kasih 1 frame buat browser nge-layout dulu sebelum GSAP init
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setIsReady(true));
-      });
-    };
+    async function preparePage() {
+      await Promise.all([
+        waitForPageLoad(),
+        waitForFonts(),
+        Promise.all(EXPERIENCE_IMAGE_SOURCES.map(preloadImage)),
+      ]);
 
-    const check = () => {
-      if (document.readyState === 'complete') {
-        document.fonts.ready.then(markReady);
-      }
-    };
-
-    if (document.readyState === 'complete') {
-      document.fonts.ready.then(markReady);
-    } else {
-      window.addEventListener('load', check);
-      return () => window.removeEventListener('load', check);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      if (!cancelled) setAssetsReady(true);
     }
+
+    preparePage();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (!isReady) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-[60]">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
-          <div className="absolute inset-0 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
-        </div>
-        <p className="mt-4 text-white/60 text-sm tracking-wider font-mono animate-pulse">
-          LOADING PORTFOLIO...
-        </p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (isReady) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isReady]);
 
   return (
     <>
@@ -88,7 +109,7 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 30, pointerEvents: 'none' }}>
         <div style={{ height: `${HERO_HOLD * 100}svh`, pointerEvents: 'none' }} />
 
-        <Experience />
+        <Experience onReady={() => setExperienceReady(true)} />
 
         <div
           style={{
@@ -125,6 +146,21 @@ export default function Home() {
 
           <Skills />
         </div>
+      </div>
+
+      <div
+        aria-hidden={isReady}
+        className={`fixed inset-0 flex flex-col items-center justify-center bg-black z-[200] transition-opacity duration-500 ${
+          isReady ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100'
+        }`}
+      >
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-blue-500 rounded-full animate-spin border-t-transparent" />
+        </div>
+        <p className="mt-4 text-white/60 text-sm tracking-wider font-mono animate-pulse">
+          LOADING PORTFOLIO...
+        </p>
       </div>
     </>
   );

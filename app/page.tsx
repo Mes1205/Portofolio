@@ -43,8 +43,7 @@ export default function Home() {
   const { isDark } = useTheme();
   const [assetsReady, setAssetsReady] = useState(false);
   const [experienceReady, setExperienceReady] = useState(false);
-  const [readyFallback, setReadyFallback] = useState(false);
-  const isReady = assetsReady && (experienceReady || readyFallback);
+  const isReady = assetsReady && experienceReady;
 
   useEffect(() => {
     let cancelled = false;
@@ -67,20 +66,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (experienceReady) return;
-
-    const timer = window.setTimeout(() => setReadyFallback(true), 2500);
-    return () => window.clearTimeout(timer);
-  }, [experienceReady]);
-
-  useEffect(() => {
     if (isReady) return;
 
     const previousOverflow = document.body.style.overflow;
+    const previousScrollRestoration = window.history.scrollRestoration;
+
+    window.history.scrollRestoration = 'manual';
     document.body.style.overflow = 'hidden';
+    if (!window.location.hash) window.scrollTo(0, 0);
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      window.history.scrollRestoration = previousScrollRestoration;
     };
   }, [isReady]);
 

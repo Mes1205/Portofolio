@@ -669,6 +669,7 @@ export default function Experience({ onReady }) {
 
       const getMaxX = () => Math.max(0, scrollbox.scrollWidth - window.innerWidth);
       scrollbox.scrollLeft = 0;
+      const waitFrames = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       ctx = gsap.context(() => {
 
@@ -735,8 +736,24 @@ export default function Experience({ onReady }) {
 
       }, section);
 
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        ScrollTrigger.refresh();
+        await waitFrames();
+        if (cancelled) return;
+
+        const horizontalTrigger = ScrollTrigger.getById('experience-horizontal');
+        const hasScrollableWidth = getMaxX() > 0;
+        const hasTriggerDistance = horizontalTrigger && horizontalTrigger.end > horizontalTrigger.start;
+
+        if (hasScrollableWidth && hasTriggerDistance) {
+          reportReady();
+          return;
+        }
+      }
+
       ScrollTrigger.refresh();
-      requestAnimationFrame(reportReady);
+      await waitFrames();
+      if (!cancelled) reportReady();
     }
 
     init().catch((error) => {

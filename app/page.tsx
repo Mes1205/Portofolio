@@ -8,6 +8,7 @@ import Hero from '@/components/Hero';
 import Experience, { EXPERIENCE_INITIAL_IMAGE_SOURCES } from '@/components/Experience';
 import Projects from '@/components/Projects';
 import Skills from '@/components/Skills';
+import Contact from '@/components/Contact';
 
 export const HERO_HOLD = 1;
 export const EXP_SLIDE = 1;
@@ -174,6 +175,7 @@ export default function Home() {
           />
 
           <Skills />
+          <Contact />
         </div>
       </div>
 

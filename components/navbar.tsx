@@ -154,6 +154,14 @@ const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
   }
 };
 
+const scrollToContact = () => {
+  const el = document.getElementById('contact');
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const scrollTop = window.scrollY + rect.top;
+  window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+};
+
   return (
     <>
       <div
@@ -251,8 +259,8 @@ const scrollToSection = (e: React.MouseEvent, href: string, index: number) => {
           <button
             className="h-[34px] px-3 md:px-5 rounded-[26px] flex items-center justify-center cursor-pointer transition-transform active:scale-95 hover:opacity-90"
             style={{ background: isDark ? '#60a5fa' : '#1e1b4b' }}
-            onClick={() => window.location.href = 'mailto:mmeslinafs@gmail.com'}
-            aria-label="Email Martha"
+            onClick={scrollToContact}
+            aria-label="Open contact form"
           >
             <p className="text-[12px] font-bold text-white flex items-center gap-2">
               <span className="hidden min-[390px]:inline">Let&apos;s Talk</span> <Send size={14} />
